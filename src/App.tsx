@@ -31,8 +31,7 @@ function AppContent() {
 
         if (!existingMedia || existingMedia.length === 0) {
           // Seed media data
-          await supabase.from('media').insert(sampleMedia)
-          console.log('Sample media data seeded')
+                 await supabase.from('media').insert(sampleMedia)
         }
 
         // Check for user media
@@ -49,13 +48,12 @@ function AppContent() {
             user_id: user.id
           }))
           
-          await supabase.from('user_media').insert(userMediaWithCorrectId)
-          console.log('Sample user media data seeded')
+                 await supabase.from('user_media').insert(userMediaWithCorrectId)
         }
 
         setDataSeeded(true)
       } catch (error) {
-        console.log('Data seeding skipped - using demo mode')
+        // Data seeding skipped - using demo mode
         // In demo mode without database connection
       }
     }

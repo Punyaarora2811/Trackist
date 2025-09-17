@@ -1,24 +1,16 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
+import { searchAllMedia, type MediaItem } from '@/services/apiServices'
 
 export function useMediaSearch(query: string, type?: string) {
   return useQuery({
     queryKey: ['media', 'search', query, type],
-    queryFn: async () => {
-      let queryBuilder = supabase
-        .from('media')
-        .select('*')
-        .ilike('title', `%${query}%`)
-
-      if (type && type !== 'all') {
-        queryBuilder = queryBuilder.eq('type', type)
-      }
-
-      const { data, error } = await queryBuilder.limit(20)
-      if (error) throw error
-      return data
+    queryFn: async (): Promise<MediaItem[]> => {
+      // Use external APIs for search instead of local database
+      return await searchAllMedia(query, type)
     },
     enabled: query.length > 2,
+    staleTime: 5 * 60 * 1000, // Cache results for 5 minutes
   })
 }
 
@@ -62,11 +54,44 @@ export function useAddToList() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async ({ userId, mediaId, status }: {
+    mutationFn: async ({ userId, mediaItem, status }: {
       userId: string
-      mediaId: string
+      mediaItem: MediaItem
       status: string
     }) => {
+      // First, ensure the media item exists in our database
+      const { data: existingMedia, error: fetchError } = await supabase
+        .from('media')
+        .select('id')
+        .eq('api_id', mediaItem.api_id)
+        .eq('type', mediaItem.type)
+        .single()
+
+      let mediaId: string
+
+      if (fetchError || !existingMedia) {
+        // Media doesn't exist, create it
+        const { data: newMedia, error: insertError } = await supabase
+          .from('media')
+          .insert({
+            api_id: mediaItem.api_id,
+            type: mediaItem.type,
+            title: mediaItem.title,
+            description: mediaItem.description,
+            poster_url: mediaItem.poster_url,
+            release_date: mediaItem.release_date,
+            genres: mediaItem.genres,
+          })
+          .select('id')
+          .single()
+
+        if (insertError) throw insertError
+        mediaId = newMedia.id
+      } else {
+        mediaId = existingMedia.id
+      }
+
+      // Now create the user_media relationship
       const { data, error } = await supabase
         .from('user_media')
         .upsert({

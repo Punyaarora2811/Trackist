@@ -20,11 +20,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       setUser(session?.user ?? null)
+
       if (session?.user) {
-        fetchUserProfile(session.user.id)
+        // Don't await - fetch in background and don't block loading
+        fetchUserProfile(session.user.id).catch(err => {
+          console.warn('Failed to fetch user profile:', err)
+        })
       }
+
       setLoading(false)
     })
 
@@ -32,11 +37,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         setUser(session?.user ?? null)
+
         if (session?.user) {
-          await fetchUserProfile(session.user.id)
+          // Don't await - fetch in background and don't block loading
+          fetchUserProfile(session.user.id).catch(err => {
+            console.warn('Failed to fetch user profile:', err)
+          })
         } else {
           setUserProfile(null)
         }
+
         setLoading(false)
       }
     )
@@ -45,13 +55,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   async function fetchUserProfile(userId: string) {
-    const { data } = await supabase
-      .from('users')
-      .select('*')
-      .eq('id', userId)
-      .single()
-    
-    setUserProfile(data)
+    try {
+      // Add timeout to prevent infinite hanging
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Database query timeout')), 10000)
+      )
+
+      const queryPromise = supabase
+        .from('users')
+        .select('*')
+        .eq('id', userId)
+        .single()
+
+      const { data, error } = await Promise.race([queryPromise, timeoutPromise]) as any
+
+      if (error) {
+        console.warn('Error fetching user profile:', error.message)
+        setUserProfile(null)
+      } else {
+        setUserProfile(data)
+      }
+    } catch (error) {
+      console.error('Failed to fetch user profile:', error)
+      setUserProfile(null)
+    }
   }
 
   async function signIn(email: string, password: string) {
@@ -66,19 +93,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { error, data } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        data: {
+          username: username // Pass username in metadata for the trigger
+        }
+      }
     })
     if (error) throw error
 
-    if (data.user) {
-      // Create user profile
-      await supabase.from('users').insert({
-        id: data.user.id,
-        email,
-        username,
-        role: 'user',
-        is_private: false,
-      })
-    }
+    // Profile creation is now handled automatically by database trigger
+    // No need to manually insert into users table
   }
 
   async function signOut() {

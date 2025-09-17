@@ -13,8 +13,9 @@ interface MediaCardProps {
     release_date?: string
     genres?: string[]
     description?: string
+    api_id?: string
   }
-  onAddToList?: (mediaId: string) => void
+  onAddToList?: (media: any) => void
   showAddButton?: boolean
 }
 
@@ -40,7 +41,7 @@ export function MediaCard({ media, onAddToList, showAddButton = true }: MediaCar
             className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
             onClick={(e) => {
               e.stopPropagation()
-              onAddToList?.(media.id)
+              onAddToList?.(media)
             }}
           >
             <Plus className="h-4 w-4" />

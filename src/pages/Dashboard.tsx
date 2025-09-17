@@ -12,16 +12,16 @@ export function Dashboard() {
   const stats = userMedia?.reduce((acc, item) => {
     const mediaType = item.media.type
     const status = item.status
-    
+
     if (!acc[mediaType]) {
       acc[mediaType] = { total: 0, completed: 0, watching: 0, planned: 0 }
     }
-    
+
     acc[mediaType].total++
     if (status === 'completed') acc[mediaType].completed++
     if (status === 'watching') acc[mediaType].watching++
     if (status === 'plan_to_watch') acc[mediaType].planned++
-    
+
     return acc
   }, {} as any) || {}
 
@@ -48,14 +48,14 @@ export function Dashboard() {
 
   return (
     <div className="p-6 space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">
-          Welcome back, {userProfile?.username}!
-        </h1>
-        <p className="text-gray-600 mt-1">
-          Here's what's happening with your media tracking
-        </p>
-      </div>
+             <div>
+               <h1 className="text-3xl font-bold text-gray-900">
+                 Welcome back{userProfile?.username ? `, ${userProfile.username}` : ''}!
+               </h1>
+               <p className="text-gray-600 mt-1">
+                 Here's what's happening with your media tracking
+               </p>
+             </div>
 
       {/* Stats Overview */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

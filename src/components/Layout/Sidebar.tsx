@@ -55,7 +55,7 @@ export function Sidebar({ currentPage, onPageChange }: SidebarProps) {
             🎬 Trackist
           </div>
         </div>
-        
+
         <div className="mt-8 flex-grow flex flex-col">
           <nav className="flex-1 px-2 space-y-1">
             {navigation.map((item) => (

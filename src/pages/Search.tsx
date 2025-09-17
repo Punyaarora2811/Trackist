@@ -14,11 +14,11 @@ export function Search() {
   const { data: searchResults, isLoading } = useMediaSearch(query, selectedType)
   const addToListMutation = useAddToList()
 
-  const handleAddToList = (mediaId: string) => {
+  const handleAddToList = (media: any) => {
     if (userProfile?.id) {
       addToListMutation.mutate({
         userId: userProfile.id,
-        mediaId,
+        mediaItem: media,
         status: 'plan_to_watch'
       })
     }

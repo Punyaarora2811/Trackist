@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { AuthProvider, useAuth } from '@/contexts/AuthContext'
+import { ThemeProvider } from '@/contexts/ThemeContext'
 import { Sidebar } from '@/components/Layout/Sidebar'
 import { Header } from '@/components/Layout/Header'
 import { Dashboard } from '@/pages/Dashboard'
@@ -31,7 +32,7 @@ function AppContent() {
 
         if (!existingMedia || existingMedia.length === 0) {
           // Seed media data
-                 await supabase.from('media').insert(sampleMedia)
+          await supabase.from('media').insert(sampleMedia)
         }
 
         // Check for user media
@@ -47,8 +48,8 @@ function AppContent() {
             ...item,
             user_id: user.id
           }))
-          
-                 await supabase.from('user_media').insert(userMediaWithCorrectId)
+
+          await supabase.from('user_media').insert(userMediaWithCorrectId)
         }
 
         setDataSeeded(true)
@@ -63,8 +64,8 @@ function AppContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     )
   }
@@ -82,29 +83,29 @@ function AppContent() {
       case 'lists':
         return (
           <div className="p-6">
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">My Lists</h1>
-            <p className="text-gray-600">Manage your watchlists, reading lists, and gaming queues here.</p>
+            <h1 className="text-3xl font-bold text-foreground mb-4">My Lists</h1>
+            <p className="text-muted-foreground">Manage your watchlists, reading lists, and gaming queues here.</p>
           </div>
         )
       case 'trending':
         return (
           <div className="p-6">
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">Trending</h1>
-            <p className="text-gray-600">Discover what's popular across all media types.</p>
+            <h1 className="text-3xl font-bold text-foreground mb-4">Trending</h1>
+            <p className="text-muted-foreground">Discover what's popular across all media types.</p>
           </div>
         )
       case 'profile':
         return (
           <div className="p-6">
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">Profile</h1>
-            <p className="text-gray-600">Manage your profile and account settings.</p>
+            <h1 className="text-3xl font-bold text-foreground mb-4">Profile</h1>
+            <p className="text-muted-foreground">Manage your profile and account settings.</p>
           </div>
         )
       case 'settings':
         return (
           <div className="p-6">
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">Settings</h1>
-            <p className="text-gray-600">Customize your Trackist experience.</p>
+            <h1 className="text-3xl font-bold text-foreground mb-4">Settings</h1>
+            <p className="text-muted-foreground">Customize your Trackist experience.</p>
           </div>
         )
       default:
@@ -113,12 +114,12 @@ function AppContent() {
   }
 
   return (
-    <div className="h-screen bg-gray-50 flex overflow-hidden">
+    <div className="h-screen bg-background flex overflow-hidden">
       <Sidebar currentPage={currentPage} onPageChange={setCurrentPage} />
-      
+
       <div className="flex flex-col flex-1 overflow-hidden">
         <Header onMobileMenuToggle={() => setMobileMenuOpen(!mobileMenuOpen)} />
-        
+
         <main className="flex-1 overflow-y-auto">
           {renderPage()}
         </main>
@@ -130,9 +131,11 @@ function AppContent() {
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <AppContent />
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <AppContent />
+        </AuthProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   )
 }

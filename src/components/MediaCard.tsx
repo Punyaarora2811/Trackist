@@ -22,7 +22,7 @@ interface MediaCardProps {
 export function MediaCard({ media, onAddToList, showAddButton = true }: MediaCardProps) {
   return (
     <Card className="group hover:shadow-lg transition-all duration-200 hover:scale-[1.02] overflow-hidden">
-      <div className="aspect-[2/3] bg-gray-200 relative overflow-hidden">
+      <div className="aspect-[2/3] bg-muted relative overflow-hidden">
         {media.poster_url ? (
           <img
             src={media.poster_url}
@@ -48,7 +48,7 @@ export function MediaCard({ media, onAddToList, showAddButton = true }: MediaCar
           </Button>
         )}
       </div>
-      
+
       <CardContent className="p-4">
         <div className="flex items-start justify-between mb-2">
           <h3 className="font-semibold text-lg leading-tight line-clamp-2">
@@ -58,13 +58,13 @@ export function MediaCard({ media, onAddToList, showAddButton = true }: MediaCar
             {media.type}
           </Badge>
         </div>
-        
+
         {media.release_date && (
-          <p className="text-sm text-gray-500 mb-2">
+          <p className="text-sm text-muted-foreground mb-2">
             {new Date(media.release_date).getFullYear()}
           </p>
         )}
-        
+
         {media.genres && media.genres.length > 0 && (
           <div className="flex flex-wrap gap-1 mb-2">
             {media.genres.slice(0, 3).map((genre) => (
@@ -74,9 +74,9 @@ export function MediaCard({ media, onAddToList, showAddButton = true }: MediaCar
             ))}
           </div>
         )}
-        
+
         {media.description && (
-          <p className="text-sm text-gray-600 line-clamp-3">
+          <p className="text-sm text-muted-foreground line-clamp-3">
             {truncateText(media.description, 120)}
           </p>
         )}

@@ -1,11 +1,11 @@
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/contexts/AuthContext'
-import { 
-  Home, 
-  Search, 
-  Bookmark, 
-  TrendingUp, 
-  User, 
+import {
+  Home,
+  Search,
+  Bookmark,
+  TrendingUp,
+  User,
   Settings,
   Film,
   Tv,
@@ -49,9 +49,9 @@ export function Sidebar({ currentPage, onPageChange }: SidebarProps) {
 
   return (
     <div className="hidden md:flex md:w-64 md:flex-col">
-      <div className="flex flex-col flex-grow pt-5 pb-4 overflow-y-auto bg-white border-r border-gray-200">
+      <div className="flex flex-col flex-grow pt-5 pb-4 overflow-y-auto bg-background border-r border-border">
         <div className="flex items-center flex-shrink-0 px-4">
-          <div className="text-2xl font-bold text-gray-900">
+          <div className="text-2xl font-bold text-foreground">
             🎬 Trackist
           </div>
         </div>
@@ -65,16 +65,16 @@ export function Sidebar({ currentPage, onPageChange }: SidebarProps) {
                 className={cn(
                   'w-full group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all',
                   currentPage === item.id
-                    ? 'bg-indigo-100 text-indigo-900'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    ? 'bg-primary/10 text-primary'
+                    : 'text-muted-foreground hover:bg-accent hover:text-foreground'
                 )}
               >
                 <item.icon
                   className={cn(
                     'mr-3 h-5 w-5',
                     currentPage === item.id
-                      ? 'text-indigo-500'
-                      : 'text-gray-400'
+                      ? 'text-primary'
+                      : 'text-muted-foreground'
                   )}
                 />
                 {item.name}
@@ -82,7 +82,7 @@ export function Sidebar({ currentPage, onPageChange }: SidebarProps) {
             ))}
 
             <div className="mt-6">
-              <div className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              <div className="px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Media Types
               </div>
               {mediaTypes.map((item) => (
@@ -92,16 +92,16 @@ export function Sidebar({ currentPage, onPageChange }: SidebarProps) {
                   className={cn(
                     'w-full group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all',
                     currentPage === item.id
-                      ? 'bg-indigo-100 text-indigo-900'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                      ? 'bg-primary/10 text-primary'
+                      : 'text-muted-foreground hover:bg-accent hover:text-foreground'
                   )}
                 >
                   <item.icon
                     className={cn(
                       'mr-3 h-5 w-5',
                       currentPage === item.id
-                        ? 'text-indigo-500'
-                        : 'text-gray-400'
+                        ? 'text-primary'
+                        : 'text-muted-foreground'
                     )}
                   />
                   {item.name}
@@ -111,7 +111,7 @@ export function Sidebar({ currentPage, onPageChange }: SidebarProps) {
 
             {adminNav.length > 0 && (
               <div className="mt-6">
-                <div className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                <div className="px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                   Admin
                 </div>
                 {adminNav.map((item) => (
@@ -121,16 +121,16 @@ export function Sidebar({ currentPage, onPageChange }: SidebarProps) {
                     className={cn(
                       'w-full group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all',
                       currentPage === item.id
-                        ? 'bg-indigo-100 text-indigo-900'
-                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                        ? 'bg-primary/10 text-primary'
+                        : 'text-muted-foreground hover:bg-accent hover:text-foreground'
                     )}
                   >
                     <item.icon
                       className={cn(
                         'mr-3 h-5 w-5',
                         currentPage === item.id
-                          ? 'text-indigo-500'
-                          : 'text-gray-400'
+                          ? 'text-primary'
+                          : 'text-muted-foreground'
                       )}
                     />
                     {item.name}
@@ -147,16 +147,16 @@ export function Sidebar({ currentPage, onPageChange }: SidebarProps) {
                   className={cn(
                     'w-full group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all',
                     currentPage === item.id
-                      ? 'bg-indigo-100 text-indigo-900'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                      ? 'bg-primary/10 text-primary'
+                      : 'text-muted-foreground hover:bg-accent hover:text-foreground'
                   )}
                 >
                   <item.icon
                     className={cn(
                       'mr-3 h-5 w-5',
                       currentPage === item.id
-                        ? 'text-indigo-500'
-                        : 'text-gray-400'
+                        ? 'text-primary'
+                        : 'text-muted-foreground'
                     )}
                   />
                   {item.name}

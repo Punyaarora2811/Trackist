@@ -10,7 +10,7 @@ export function Search() {
   const [query, setQuery] = useState('')
   const [selectedType, setSelectedType] = useState('all')
   const { userProfile } = useAuth()
-  
+
   const { data: searchResults, isLoading } = useMediaSearch(query, selectedType)
   const addToListMutation = useAddToList()
 
@@ -35,8 +35,8 @@ export function Search() {
   return (
     <div className="p-6 space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Search Media</h1>
-        <p className="text-gray-600 mt-1">
+        <h1 className="text-3xl font-bold text-foreground">Search Media</h1>
+        <p className="text-muted-foreground mt-1">
           Discover movies, TV shows, books, and games to add to your lists
         </p>
       </div>
@@ -44,7 +44,7 @@ export function Search() {
       {/* Search Controls */}
       <div className="flex flex-col md:flex-row gap-4">
         <div className="relative flex-1">
-          <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+          <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
           <Input
             placeholder="Search for movies, shows, books, games..."
             value={query}
@@ -52,9 +52,9 @@ export function Search() {
             className="pl-10"
           />
         </div>
-        
+
         <div className="flex items-center space-x-2">
-          <Filter className="h-4 w-4 text-gray-400" />
+          <Filter className="h-4 w-4 text-muted-foreground" />
           <div className="flex space-x-1">
             {mediaTypes.map((type) => (
               <Button
@@ -105,7 +105,7 @@ export function Search() {
                 Search Results ({searchResults.length})
               </h2>
             </div>
-            
+
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
               {searchResults.map((media) => (
                 <MediaCard

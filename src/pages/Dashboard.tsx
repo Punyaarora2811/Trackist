@@ -48,14 +48,14 @@ export function Dashboard() {
 
   return (
     <div className="p-6 space-y-6">
-             <div>
-               <h1 className="text-3xl font-bold text-gray-900">
-                 Welcome back{userProfile?.username ? `, ${userProfile.username}` : ''}!
-               </h1>
-               <p className="text-gray-600 mt-1">
-                 Here's what's happening with your media tracking
-               </p>
-             </div>
+      <div>
+        <h1 className="text-3xl font-bold text-foreground">
+          Welcome back{userProfile?.username ? `, ${userProfile.username}` : ''}!
+        </h1>
+        <p className="text-muted-foreground mt-1">
+          Here's what's happening with your media tracking
+        </p>
+      </div>
 
       {/* Stats Overview */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

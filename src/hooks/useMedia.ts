@@ -507,7 +507,7 @@ export function useUpdateProfile() {
       updates: { username?: string; bio?: string; is_private?: boolean }
     }) => {
       console.log('Updating profile for user:', userId, 'with updates:', updates)
-      
+
       const { data, error } = await supabase
         .from('users')
         .update(updates)
@@ -519,7 +519,7 @@ export function useUpdateProfile() {
         console.error('Database update error:', error)
         throw error
       }
-      
+
       console.log('Profile updated successfully:', data)
       return data
     },

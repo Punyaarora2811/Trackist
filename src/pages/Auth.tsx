@@ -12,6 +12,7 @@ export function Auth() {
   const [username, setUsername] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
   const [showPassword, setShowPassword] = useState(false)
 
   const { signIn, signUp } = useAuth()
@@ -20,12 +21,24 @@ export function Auth() {
     e.preventDefault()
     setLoading(true)
     setError('')
+    setSuccess('')
 
     try {
       if (isLogin) {
         await signIn(email, password)
       } else {
         await signUp(email, password, username)
+        // Show success message for registration
+        setSuccess('Account created successfully! Welcome to Trackist!')
+        // Clear form
+        setEmail('')
+        setPassword('')
+        setUsername('')
+        // Switch to login mode after a delay
+        setTimeout(() => {
+          setIsLogin(true)
+          setSuccess('')
+        }, 3000)
       }
     } catch (error: any) {
       setError(error.message || 'An error occurred')
@@ -251,6 +264,17 @@ export function Auth() {
                 </div>
               )}
 
+              {success && (
+                <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-300 text-sm p-4 rounded-xl flex items-center space-x-2">
+                  <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                    <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <span>{success}</span>
+                </div>
+              )}
+
               <Button
                 type="submit"
                 className="w-full h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-xl transition-all duration-300 hover:shadow-lg hover:scale-[1.02]"
@@ -270,7 +294,11 @@ export function Auth() {
             <div className="mt-6 text-center">
               <button
                 type="button"
-                onClick={() => setIsLogin(!isLogin)}
+                onClick={() => {
+                  setIsLogin(!isLogin)
+                  setError('')
+                  setSuccess('')
+                }}
                 className="text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors duration-200"
               >
                 {isLogin

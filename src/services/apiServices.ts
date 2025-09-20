@@ -165,6 +165,139 @@ export async function getTVShowDetails(apiId: string): Promise<{ totalEpisodes: 
   }
 }
 
+// TMDB Trending Movies
+export async function getTrendingMovies(): Promise<MediaItem[]> {
+  if (!TMDB_API_KEY) {
+    return []
+  }
+
+  try {
+    const response = await fetch(
+      `${TMDB_BASE_URL}/trending/movie/week?api_key=${TMDB_API_KEY}`
+    )
+
+    if (!response.ok) throw new Error('TMDB API error')
+
+    const data = await response.json()
+
+    return data.results.map((movie: any): MediaItem => ({
+      id: `tmdb-movie-${movie.id}`,
+      api_id: movie.id.toString(),
+      type: 'movie',
+      title: movie.title,
+      description: movie.overview,
+      poster_url: movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : undefined,
+      release_date: movie.release_date,
+      genres: movie.genre_ids?.map((id: number) => getMovieGenreName(id)) || []
+    }))
+  } catch (error) {
+    return []
+  }
+}
+
+// TMDB Trending TV Shows
+export async function getTrendingTVShows(): Promise<MediaItem[]> {
+  if (!TMDB_API_KEY) {
+    return []
+  }
+
+  try {
+    const response = await fetch(
+      `${TMDB_BASE_URL}/trending/tv/week?api_key=${TMDB_API_KEY}`
+    )
+
+    if (!response.ok) throw new Error('TMDB API error')
+
+    const data = await response.json()
+
+    return data.results.map((show: any): MediaItem => ({
+      id: `tmdb-tv-${show.id}`,
+      api_id: show.id.toString(),
+      type: 'tv',
+      title: show.name,
+      description: show.overview,
+      poster_url: show.poster_path ? `https://image.tmdb.org/t/p/w500${show.poster_path}` : undefined,
+      release_date: show.first_air_date,
+      genres: show.genre_ids?.map((id: number) => getTVGenreName(id)) || []
+    }))
+  } catch (error) {
+    return []
+  }
+}
+
+// RAWG Trending Games
+export async function getTrendingGames(): Promise<MediaItem[]> {
+  if (!RAWG_API_KEY) {
+    return []
+  }
+
+  try {
+    const response = await fetch(
+      `${RAWG_BASE_URL}/games?key=${RAWG_API_KEY}&ordering=-rating&page_size=20`
+    )
+
+    if (!response.ok) throw new Error('RAWG API error')
+
+    const data = await response.json()
+
+    return data.results.map((game: any): MediaItem => ({
+      id: `rawg-${game.id}`,
+      api_id: game.id.toString(),
+      type: 'game',
+      title: game.name,
+      description: game.description_raw,
+      poster_url: game.background_image,
+      release_date: game.released,
+      genres: game.genres?.map((genre: any) => genre.name) || []
+    }))
+  } catch (error) {
+    return []
+  }
+}
+
+// Google Books Popular Books (using bestsellers)
+export async function getTrendingBooks(): Promise<MediaItem[]> {
+  if (!GOOGLE_BOOKS_API_KEY) {
+    return []
+  }
+
+  try {
+    const response = await fetch(
+      `${GOOGLE_BOOKS_BASE_URL}/volumes?q=bestseller&key=${GOOGLE_BOOKS_API_KEY}&maxResults=20&orderBy=relevance`
+    )
+
+    if (!response.ok) throw new Error('Google Books API error')
+
+    const data = await response.json()
+
+    return (data.items || []).map((book: any): MediaItem => ({
+      id: `books-${book.id}`,
+      api_id: book.id,
+      type: 'book',
+      title: book.volumeInfo.title,
+      description: book.volumeInfo.description,
+      poster_url: book.volumeInfo.imageLinks?.thumbnail,
+      release_date: book.volumeInfo.publishedDate,
+      genres: book.volumeInfo.categories || []
+    }))
+  } catch (error) {
+    return []
+  }
+}
+
+// Combined trending function
+export async function getAllTrendingMedia(): Promise<MediaItem[]> {
+  const promises: Promise<MediaItem[]>[] = [
+    getTrendingMovies(),
+    getTrendingTVShows(),
+    getTrendingBooks(),
+    getTrendingGames()
+  ]
+
+  const results = await Promise.all(promises)
+  return results.flat().slice(0, 40) // Limit total results
+}
+
 // Combined search function
 export async function searchAllMedia(query: string, type?: string): Promise<MediaItem[]> {
   const promises: Promise<MediaItem[]>[] = []

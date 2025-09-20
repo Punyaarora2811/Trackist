@@ -105,7 +105,7 @@ export function UserLists() {
                     <div className="relative bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-3xl p-8 border border-white/20 dark:border-slate-700/50">
                         <div className="flex items-center justify-between">
                             <div>
-                                <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+                                <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent leading-tight">
                                     My Media
                                 </h1>
                                 <p className="text-slate-600 dark:text-slate-300 mt-2 text-lg">

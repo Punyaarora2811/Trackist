@@ -7,10 +7,6 @@ import {
   TrendingUp,
   User,
   Settings,
-  Film,
-  Tv,
-  Book,
-  Gamepad2,
   BarChart3,
   Users
 } from 'lucide-react'
@@ -28,13 +24,6 @@ export function Sidebar({ currentPage, onPageChange }: SidebarProps) {
     { name: 'Search', icon: Search, id: 'search' },
     { name: 'My Media', icon: Bookmark, id: 'lists' },
     { name: 'Trending', icon: TrendingUp, id: 'trending' },
-  ]
-
-  const mediaTypes = [
-    { name: 'Movies', icon: Film, id: 'movies' },
-    { name: 'TV Shows', icon: Tv, id: 'tv' },
-    { name: 'Books', icon: Book, id: 'books' },
-    { name: 'Games', icon: Gamepad2, id: 'games' },
   ]
 
   const userNav = [
@@ -80,34 +69,6 @@ export function Sidebar({ currentPage, onPageChange }: SidebarProps) {
                 {item.name}
               </button>
             ))}
-
-            <div className="mt-6">
-              <div className="px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                Media Types
-              </div>
-              {mediaTypes.map((item) => (
-                <button
-                  key={item.name}
-                  onClick={() => onPageChange(item.id)}
-                  className={cn(
-                    'w-full group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all',
-                    currentPage === item.id
-                      ? 'bg-primary/10 text-primary'
-                      : 'text-muted-foreground hover:bg-accent hover:text-foreground'
-                  )}
-                >
-                  <item.icon
-                    className={cn(
-                      'mr-3 h-5 w-5',
-                      currentPage === item.id
-                        ? 'text-primary'
-                        : 'text-muted-foreground'
-                    )}
-                  />
-                  {item.name}
-                </button>
-              ))}
-            </div>
 
             {adminNav.length > 0 && (
               <div className="mt-6">

@@ -7,6 +7,9 @@ import { Header } from '@/components/Layout/Header'
 import { Dashboard } from '@/pages/Dashboard'
 import { Search } from '@/pages/Search'
 import { UserLists } from '@/pages/UserLists'
+import { Trending } from '@/pages/Trending'
+import { Profile } from '@/pages/Profile'
+import { Settings } from '@/pages/Settings'
 import { Auth } from '@/pages/Auth'
 import { supabase } from '@/lib/supabase'
 import { sampleMedia, sampleUserMedia } from '@/data/sampleData'
@@ -84,26 +87,11 @@ function AppContent() {
       case 'lists':
         return <UserLists />
       case 'trending':
-        return (
-          <div className="p-6">
-            <h1 className="text-3xl font-bold text-foreground mb-4">Trending</h1>
-            <p className="text-muted-foreground">Discover what's popular across all media types.</p>
-          </div>
-        )
+        return <Trending />
       case 'profile':
-        return (
-          <div className="p-6">
-            <h1 className="text-3xl font-bold text-foreground mb-4">Profile</h1>
-            <p className="text-muted-foreground">Manage your profile and account settings.</p>
-          </div>
-        )
+        return <Profile />
       case 'settings':
-        return (
-          <div className="p-6">
-            <h1 className="text-3xl font-bold text-foreground mb-4">Settings</h1>
-            <p className="text-muted-foreground">Customize your Trackist experience.</p>
-          </div>
-        )
+        return <Settings />
       default:
         return <Dashboard />
     }

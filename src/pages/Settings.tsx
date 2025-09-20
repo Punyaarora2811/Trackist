@@ -1,0 +1,581 @@
+import { useState, useEffect } from 'react'
+import { useAuth } from '@/contexts/AuthContext'
+import { useTheme } from '@/contexts/ThemeContext'
+import { useUpdateProfile, useChangePassword, useChangeEmail } from '@/hooks/useMedia'
+import { Button } from '@/components/ui/Button'
+import { Input } from '@/components/ui/Input'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
+import {
+    User,
+    Mail,
+    Lock,
+    Palette,
+    Bell,
+    Shield,
+    Trash2,
+    Save,
+    Eye,
+    EyeOff,
+    Moon,
+    Sun,
+    Settings as SettingsIcon,
+    AlertTriangle,
+    CheckCircle,
+    Info
+} from 'lucide-react'
+
+export function Settings() {
+    const { user, userProfile, signOut } = useAuth()
+    const { theme, toggleTheme } = useTheme()
+    const updateProfileMutation = useUpdateProfile()
+    const changePasswordMutation = useChangePassword()
+    const changeEmailMutation = useChangeEmail()
+
+    // Profile editing state
+    const [isEditingProfile, setIsEditingProfile] = useState(false)
+    const [profileForm, setProfileForm] = useState({
+        username: userProfile?.username || '',
+        bio: userProfile?.bio || ''
+    })
+
+    // Password change state
+    const [isChangingPassword, setIsChangingPassword] = useState(false)
+    const [passwordForm, setPasswordForm] = useState({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+    })
+    const [showPasswords, setShowPasswords] = useState({
+        current: false,
+        new: false,
+        confirm: false
+    })
+
+    // Email change state
+    const [isChangingEmail, setIsChangingEmail] = useState(false)
+    const [emailForm, setEmailForm] = useState({
+        newEmail: user?.email || ''
+    })
+
+    // Notification settings state
+    const [notifications, setNotifications] = useState({
+        emailUpdates: true,
+        weeklyDigest: true,
+        newFollowers: true,
+        mediaRecommendations: false
+    })
+
+    // Privacy settings state
+    const [privacy, setPrivacy] = useState({
+        isPrivate: userProfile?.is_private || false,
+        showEmail: false,
+        showActivity: true
+    })
+
+    // Update profile form when userProfile changes
+    useEffect(() => {
+        if (userProfile) {
+            setProfileForm({
+                username: userProfile.username || '',
+                bio: userProfile.bio || ''
+            })
+            setPrivacy(prev => ({
+                ...prev,
+                isPrivate: userProfile.is_private || false
+            }))
+        }
+    }, [userProfile])
+
+    // Update email form when user changes
+    useEffect(() => {
+        if (user?.email) {
+            setEmailForm({
+                newEmail: user.email
+            })
+        }
+    }, [user])
+
+    const handleSaveProfile = async () => {
+        if (!user?.id) return
+
+        try {
+            await updateProfileMutation.mutateAsync({
+                userId: user.id,
+                updates: profileForm
+            })
+            setIsEditingProfile(false)
+        } catch (error) {
+            console.error('Failed to update profile:', error)
+        }
+    }
+
+    const handleChangePassword = async () => {
+        if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+            alert('New passwords do not match')
+            return
+        }
+
+        try {
+            await changePasswordMutation.mutateAsync({
+                currentPassword: passwordForm.currentPassword,
+                newPassword: passwordForm.newPassword
+            })
+            setIsChangingPassword(false)
+            setPasswordForm({
+                currentPassword: '',
+                newPassword: '',
+                confirmPassword: ''
+            })
+            alert('Password changed successfully!')
+        } catch (error) {
+            console.error('Failed to change password:', error)
+            alert('Failed to change password. Please check your current password.')
+        }
+    }
+
+    const handleChangeEmail = async () => {
+        try {
+            await changeEmailMutation.mutateAsync({
+                newEmail: emailForm.newEmail
+            })
+            setIsChangingEmail(false)
+            alert('Email change request sent! Please check your new email for confirmation.')
+        } catch (error) {
+            console.error('Failed to change email:', error)
+            alert('Failed to change email. Please try again.')
+        }
+    }
+
+    const handleDeleteAccount = () => {
+        const confirmed = window.confirm(
+            'Are you sure you want to delete your account? This action cannot be undone and will permanently remove all your data.'
+        )
+        if (confirmed) {
+            // Implement account deletion logic here
+            alert('Account deletion feature coming soon. Please contact support.')
+        }
+    }
+
+    return (
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+            <div className="p-6 space-y-8">
+                {/* Header */}
+                <div className="relative">
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-pink-600/10 rounded-3xl blur-3xl"></div>
+                    <div className="relative bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-3xl p-8 border border-white/20 dark:border-slate-700/50">
+                        <div className="flex items-center gap-4">
+                            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center">
+                                <SettingsIcon className="h-8 w-8 text-white" />
+                            </div>
+                            <div>
+                                <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent leading-tight">
+                                    Settings
+                                </h1>
+                                <p className="text-slate-600 dark:text-slate-300 mt-2 text-lg">
+                                    Manage your account preferences and security
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    {/* Profile Settings */}
+                    <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-white/20 dark:border-slate-700/50">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2 text-slate-800 dark:text-slate-200">
+                                <User className="h-5 w-5" />
+                                Profile Settings
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-6">
+                            {isEditingProfile ? (
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">
+                                            Username
+                                        </label>
+                                        <Input
+                                            value={profileForm.username}
+                                            onChange={(e) => setProfileForm(prev => ({ ...prev, username: e.target.value }))}
+                                            placeholder="Enter your username"
+                                            className="h-10"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">
+                                            Bio
+                                        </label>
+                                        <Input
+                                            value={profileForm.bio}
+                                            onChange={(e) => setProfileForm(prev => ({ ...prev, bio: e.target.value }))}
+                                            placeholder="Tell us about yourself"
+                                            className="h-10"
+                                        />
+                                    </div>
+                                    <div className="flex gap-3">
+                                        <Button
+                                            onClick={handleSaveProfile}
+                                            disabled={updateProfileMutation.isPending}
+                                            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0"
+                                        >
+                                            <Save className="h-4 w-4 mr-2" />
+                                            {updateProfileMutation.isPending ? 'Saving...' : 'Save Changes'}
+                                        </Button>
+                                        <Button
+                                            variant="outline"
+                                            onClick={() => setIsEditingProfile(false)}
+                                            className="border-slate-200 dark:border-slate-600 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                                        >
+                                            Cancel
+                                        </Button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="space-y-4">
+                                    <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-700/50 rounded-lg">
+                                        <div>
+                                            <p className="font-medium text-slate-800 dark:text-slate-200">Username</p>
+                                            <p className="text-sm text-slate-600 dark:text-slate-400">{userProfile?.username || 'Not set'}</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-700/50 rounded-lg">
+                                        <div>
+                                            <p className="font-medium text-slate-800 dark:text-slate-200">Bio</p>
+                                            <p className="text-sm text-slate-600 dark:text-slate-400">{userProfile?.bio || 'No bio set'}</p>
+                                        </div>
+                                    </div>
+                                    <Button
+                                        onClick={() => setIsEditingProfile(true)}
+                                        className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0"
+                                    >
+                                        <User className="h-4 w-4 mr-2" />
+                                        Edit Profile
+                                    </Button>
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
+
+                    {/* Security Settings */}
+                    <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-white/20 dark:border-slate-700/50">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2 text-slate-800 dark:text-slate-200">
+                                <Shield className="h-5 w-5" />
+                                Security Settings
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-6">
+                            {/* Password Change */}
+                            {isChangingPassword ? (
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">
+                                            Current Password
+                                        </label>
+                                        <div className="relative">
+                                            <Input
+                                                type={showPasswords.current ? 'text' : 'password'}
+                                                value={passwordForm.currentPassword}
+                                                onChange={(e) => setPasswordForm(prev => ({ ...prev, currentPassword: e.target.value }))}
+                                                placeholder="Enter current password"
+                                                className="h-10 pr-10"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowPasswords(prev => ({ ...prev, current: !prev.current }))}
+                                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                                            >
+                                                {showPasswords.current ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">
+                                            New Password
+                                        </label>
+                                        <div className="relative">
+                                            <Input
+                                                type={showPasswords.new ? 'text' : 'password'}
+                                                value={passwordForm.newPassword}
+                                                onChange={(e) => setPasswordForm(prev => ({ ...prev, newPassword: e.target.value }))}
+                                                placeholder="Enter new password"
+                                                className="h-10 pr-10"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowPasswords(prev => ({ ...prev, new: !prev.new }))}
+                                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                                            >
+                                                {showPasswords.new ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">
+                                            Confirm New Password
+                                        </label>
+                                        <div className="relative">
+                                            <Input
+                                                type={showPasswords.confirm ? 'text' : 'password'}
+                                                value={passwordForm.confirmPassword}
+                                                onChange={(e) => setPasswordForm(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                                                placeholder="Confirm new password"
+                                                className="h-10 pr-10"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowPasswords(prev => ({ ...prev, confirm: !prev.confirm }))}
+                                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                                            >
+                                                {showPasswords.confirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div className="flex gap-3">
+                                        <Button
+                                            onClick={handleChangePassword}
+                                            disabled={changePasswordMutation.isPending}
+                                            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0"
+                                        >
+                                            <Lock className="h-4 w-4 mr-2" />
+                                            {changePasswordMutation.isPending ? 'Changing...' : 'Change Password'}
+                                        </Button>
+                                        <Button
+                                            variant="outline"
+                                            onClick={() => setIsChangingPassword(false)}
+                                            className="border-slate-200 dark:border-slate-600 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                                        >
+                                            Cancel
+                                        </Button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="space-y-4">
+                                    <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-700/50 rounded-lg">
+                                        <div>
+                                            <p className="font-medium text-slate-800 dark:text-slate-200">Password</p>
+                                            <p className="text-sm text-slate-600 dark:text-slate-400">Last changed: Unknown</p>
+                                        </div>
+                                    </div>
+                                    <Button
+                                        onClick={() => setIsChangingPassword(true)}
+                                        className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0"
+                                    >
+                                        <Lock className="h-4 w-4 mr-2" />
+                                        Change Password
+                                    </Button>
+                                </div>
+                            )}
+
+                            {/* Email Change */}
+                            {isChangingEmail ? (
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">
+                                            New Email Address
+                                        </label>
+                                        <Input
+                                            type="email"
+                                            value={emailForm.newEmail}
+                                            onChange={(e) => setEmailForm(prev => ({ ...prev, newEmail: e.target.value }))}
+                                            placeholder="Enter new email address"
+                                            className="h-10"
+                                        />
+                                    </div>
+                                    <div className="flex gap-3">
+                                        <Button
+                                            onClick={handleChangeEmail}
+                                            disabled={changeEmailMutation.isPending}
+                                            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0"
+                                        >
+                                            <Mail className="h-4 w-4 mr-2" />
+                                            {changeEmailMutation.isPending ? 'Sending...' : 'Change Email'}
+                                        </Button>
+                                        <Button
+                                            variant="outline"
+                                            onClick={() => setIsChangingEmail(false)}
+                                            className="border-slate-200 dark:border-slate-600 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                                        >
+                                            Cancel
+                                        </Button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="space-y-4">
+                                    <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-700/50 rounded-lg">
+                                        <div>
+                                            <p className="font-medium text-slate-800 dark:text-slate-200">Email Address</p>
+                                            <p className="text-sm text-slate-600 dark:text-slate-400">{user?.email || 'Not set'}</p>
+                                        </div>
+                                    </div>
+                                    <Button
+                                        onClick={() => setIsChangingEmail(true)}
+                                        className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0"
+                                    >
+                                        <Mail className="h-4 w-4 mr-2" />
+                                        Change Email
+                                    </Button>
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
+
+                    {/* Appearance Settings */}
+                    <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-white/20 dark:border-slate-700/50">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2 text-slate-800 dark:text-slate-200">
+                                <Palette className="h-5 w-5" />
+                                Appearance
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-6">
+                            <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-700/50 rounded-lg">
+                                <div>
+                                    <p className="font-medium text-slate-800 dark:text-slate-200">Theme</p>
+                                    <p className="text-sm text-slate-600 dark:text-slate-400">
+                                        Current: {theme === 'dark' ? 'Dark' : 'Light'} mode
+                                    </p>
+                                </div>
+                                <Button
+                                    onClick={toggleTheme}
+                                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0"
+                                >
+                                    {theme === 'dark' ? <Sun className="h-4 w-4 mr-2" /> : <Moon className="h-4 w-4 mr-2" />}
+                                    Switch to {theme === 'dark' ? 'Light' : 'Dark'}
+                                </Button>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Privacy Settings */}
+                    <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-white/20 dark:border-slate-700/50">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2 text-slate-800 dark:text-slate-200">
+                                <Shield className="h-5 w-5" />
+                                Privacy
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-6">
+                            <div className="space-y-4">
+                                <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-700/50 rounded-lg">
+                                    <div>
+                                        <p className="font-medium text-slate-800 dark:text-slate-200">Private Profile</p>
+                                        <p className="text-sm text-slate-600 dark:text-slate-400">Hide your profile from other users</p>
+                                    </div>
+                                    <Button
+                                        onClick={() => setPrivacy(prev => ({ ...prev, isPrivate: !prev.isPrivate }))}
+                                        className={`${privacy.isPrivate
+                                                ? 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800'
+                                                : 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800'
+                                            } text-white border-0`}
+                                    >
+                                        {privacy.isPrivate ? 'Private' : 'Public'}
+                                    </Button>
+                                </div>
+                                <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-700/50 rounded-lg">
+                                    <div>
+                                        <p className="font-medium text-slate-800 dark:text-slate-200">Show Activity</p>
+                                        <p className="text-sm text-slate-600 dark:text-slate-400">Display your recent activity to others</p>
+                                    </div>
+                                    <Button
+                                        onClick={() => setPrivacy(prev => ({ ...prev, showActivity: !prev.showActivity }))}
+                                        className={`${privacy.showActivity
+                                                ? 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800'
+                                                : 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800'
+                                            } text-white border-0`}
+                                    >
+                                        {privacy.showActivity ? 'Visible' : 'Hidden'}
+                                    </Button>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Notifications Settings */}
+                    <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-white/20 dark:border-slate-700/50">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2 text-slate-800 dark:text-slate-200">
+                                <Bell className="h-5 w-5" />
+                                Notifications
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-6">
+                            <div className="space-y-4">
+                                {Object.entries(notifications).map(([key, value]) => (
+                                    <div key={key} className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-700/50 rounded-lg">
+                                        <div>
+                                            <p className="font-medium text-slate-800 dark:text-slate-200">
+                                                {key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+                                            </p>
+                                            <p className="text-sm text-slate-600 dark:text-slate-400">
+                                                {key === 'emailUpdates' && 'Receive email notifications for important updates'}
+                                                {key === 'weeklyDigest' && 'Get weekly summary of your activity'}
+                                                {key === 'newFollowers' && 'Notify when someone follows you'}
+                                                {key === 'mediaRecommendations' && 'Get personalized media recommendations'}
+                                            </p>
+                                        </div>
+                                        <Button
+                                            onClick={() => setNotifications(prev => ({ ...prev, [key]: !value }))}
+                                            className={`${value
+                                                    ? 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800'
+                                                    : 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800'
+                                                } text-white border-0`}
+                                        >
+                                            {value ? 'On' : 'Off'}
+                                        </Button>
+                                    </div>
+                                ))}
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Danger Zone */}
+                    <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-red-200 dark:border-red-800">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2 text-red-600 dark:text-red-400">
+                                <AlertTriangle className="h-5 w-5" />
+                                Danger Zone
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-6">
+                            <div className="space-y-4">
+                                <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400" />
+                                        <p className="font-medium text-red-800 dark:text-red-200">Sign Out</p>
+                                    </div>
+                                    <p className="text-sm text-red-600 dark:text-red-400 mb-3">
+                                        Sign out of your account on this device
+                                    </p>
+                                    <Button
+                                        onClick={signOut}
+                                        className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white border-0"
+                                    >
+                                        Sign Out
+                                    </Button>
+                                </div>
+                                <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <Trash2 className="h-4 w-4 text-red-600 dark:text-red-400" />
+                                        <p className="font-medium text-red-800 dark:text-red-200">Delete Account</p>
+                                    </div>
+                                    <p className="text-sm text-red-600 dark:text-red-400 mb-3">
+                                        Permanently delete your account and all associated data. This action cannot be undone.
+                                    </p>
+                                    <Button
+                                        onClick={handleDeleteAccount}
+                                        className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white border-0"
+                                    >
+                                        <Trash2 className="h-4 w-4 mr-2" />
+                                        Delete Account
+                                    </Button>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+            </div>
+        </div>
+    )
+}

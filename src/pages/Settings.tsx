@@ -67,9 +67,7 @@ export function Settings() {
 
     // Privacy settings state
     const [privacy, setPrivacy] = useState({
-        isPrivate: userProfile?.is_private || false,
-        showEmail: false,
-        showActivity: true
+        isPrivate: userProfile?.is_private || false
     })
 
     // Update profile form when userProfile changes
@@ -79,10 +77,9 @@ export function Settings() {
                 username: userProfile.username || '',
                 bio: userProfile.bio || ''
             })
-            setPrivacy(prev => ({
-                ...prev,
+            setPrivacy({
                 isPrivate: userProfile.is_private || false
-            }))
+            })
         }
     }, [userProfile])
 
@@ -103,8 +100,7 @@ export function Settings() {
                 userId: user.id,
                 updates: {
                     ...profileForm,
-                    is_private: privacy.isPrivate,
-                    show_activity: privacy.showActivity
+                    is_private: privacy.isPrivate
                 }
             })
             setIsEditingProfile(false)
@@ -116,16 +112,20 @@ export function Settings() {
     const handleSavePrivacy = async () => {
         if (!user?.id) return
 
+        console.log('Saving privacy settings:', { isPrivate: privacy.isPrivate })
+
         try {
-            await updateProfileMutation.mutateAsync({
+            const result = await updateProfileMutation.mutateAsync({
                 userId: user.id,
                 updates: {
-                    is_private: privacy.isPrivate,
-                    show_activity: privacy.showActivity
+                    is_private: privacy.isPrivate
                 }
             })
+            console.log('Privacy settings saved successfully:', result)
+            alert('Privacy settings saved successfully!')
         } catch (error) {
             console.error('Failed to update privacy settings:', error)
+            alert('Failed to save privacy settings. Please try again.')
         }
     }
 
@@ -491,21 +491,6 @@ export function Settings() {
                                             } text-white border-0`}
                                     >
                                         {privacy.isPrivate ? 'Private' : 'Public'}
-                                    </Button>
-                                </div>
-                                <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-700/50 rounded-lg">
-                                    <div>
-                                        <p className="font-medium text-slate-800 dark:text-slate-200">Show Activity</p>
-                                        <p className="text-sm text-slate-600 dark:text-slate-400">Display your recent activity to others</p>
-                                    </div>
-                                    <Button
-                                        onClick={() => setPrivacy(prev => ({ ...prev, showActivity: !prev.showActivity }))}
-                                        className={`${privacy.showActivity
-                                            ? 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800'
-                                            : 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800'
-                                            } text-white border-0`}
-                                    >
-                                        {privacy.showActivity ? 'Visible' : 'Hidden'}
                                     </Button>
                                 </div>
                             </div>

@@ -83,7 +83,7 @@ export function useUserPublicMedia(userId: string) {
         .single()
 
       if (userError) throw userError
-      
+
       // If profile is private, return empty array
       if (user?.is_private) {
         return []
@@ -118,7 +118,7 @@ export function useUserPublicStats(userId: string) {
         .single()
 
       if (userError) throw userError
-      
+
       // If profile is private, return empty stats
       if (user?.is_private) {
         return {
@@ -504,8 +504,10 @@ export function useUpdateProfile() {
   return useMutation({
     mutationFn: async ({ userId, updates }: {
       userId: string
-      updates: { username?: string; bio?: string; is_private?: boolean; show_activity?: boolean }
+      updates: { username?: string; bio?: string; is_private?: boolean }
     }) => {
+      console.log('Updating profile for user:', userId, 'with updates:', updates)
+      
       const { data, error } = await supabase
         .from('users')
         .update(updates)
@@ -513,10 +515,16 @@ export function useUpdateProfile() {
         .select()
         .single()
 
-      if (error) throw error
+      if (error) {
+        console.error('Database update error:', error)
+        throw error
+      }
+      
+      console.log('Profile updated successfully:', data)
       return data
     },
     onSuccess: (_, variables) => {
+      console.log('Invalidating queries for user:', variables.userId)
       queryClient.invalidateQueries({ queryKey: ['userProfile', variables.userId] })
     },
   })

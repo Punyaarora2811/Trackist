@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
+import { toast } from '@/components/ui/Toast'
 import {
   Plus,
   List,
@@ -52,6 +53,7 @@ export function MyLists() {
       setIsCreatingPlaylist(false)
     } catch (error) {
       console.error('Failed to create playlist:', error)
+      toast.error('Failed to Create Playlist', 'Please try again or contact support if the issue persists.')
     }
   }
 
@@ -60,6 +62,7 @@ export function MyLists() {
       await removeFromPlaylistMutation.mutateAsync({ playlistItemId })
     } catch (error) {
       console.error('Failed to remove from playlist:', error)
+      toast.error('Failed to Remove Item', 'Could not remove item from playlist. Please try again.')
     }
   }
 
@@ -69,6 +72,7 @@ export function MyLists() {
       setIsAddingToPlaylist(false)
     } catch (error) {
       console.error('Failed to add to playlist:', error)
+      toast.error('Failed to Add Item', 'Could not add item to playlist. Please try again.')
     }
   }
 

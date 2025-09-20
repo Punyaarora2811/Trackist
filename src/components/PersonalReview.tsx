@@ -3,26 +3,32 @@ import { Button } from '@/components/ui/Button'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/contexts/AuthContext'
 import { supabase } from '@/lib/supabase'
+import { toast } from '@/components/ui/Toast'
 
 interface PersonalReviewProps {
     mediaId: string
     mediaType: string
     rating: number
     onRatingChange: (rating: number) => void
+    userId?: string // Optional userId - if not provided, uses current user
+    isReadOnly?: boolean // If true, shows review in read-only mode
 }
 
-export function PersonalReview({ mediaId, mediaType, rating, onRatingChange }: PersonalReviewProps) {
+export function PersonalReview({ mediaId, mediaType, rating, onRatingChange, userId, isReadOnly = false }: PersonalReviewProps) {
     const { userProfile } = useAuth()
     const [reviewContent, setReviewContent] = useState('')
     const [isEditing, setIsEditing] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
 
+    // Use provided userId or fall back to current user
+    const targetUserId = userId || userProfile?.id
+
     // Load user's review on mount
     useEffect(() => {
-        if (userProfile?.id) {
+        if (targetUserId) {
             loadUserReview()
         }
-    }, [mediaId, userProfile?.id])
+    }, [mediaId, targetUserId])
 
     const loadUserReview = async () => {
         try {
@@ -30,7 +36,7 @@ export function PersonalReview({ mediaId, mediaType, rating, onRatingChange }: P
                 .from('reviews')
                 .select('content')
                 .eq('media_id', mediaId)
-                .eq('user_id', userProfile?.id)
+                .eq('user_id', targetUserId)
                 .single()
 
             if (data && !error) {
@@ -42,7 +48,7 @@ export function PersonalReview({ mediaId, mediaType, rating, onRatingChange }: P
     }
 
     const handleSaveReview = async () => {
-        if (!userProfile?.id) return
+        if (!userProfile?.id || isReadOnly) return
 
         try {
             setIsLoading(true)
@@ -65,11 +71,15 @@ export function PersonalReview({ mediaId, mediaType, rating, onRatingChange }: P
 
             if (updateError) {
                 console.error('Error saving review:', updateError)
+                toast.error('Failed to Save Review', 'Could not save your review. Please try again.')
+            } else {
+                toast.success('Review Saved', 'Your review has been saved successfully!')
             }
 
             setIsEditing(false)
         } catch (err) {
             console.error('Error in handleSaveReview:', err)
+            toast.error('Failed to Save Review', 'An unexpected error occurred. Please try again.')
         } finally {
             setIsLoading(false)
         }
@@ -81,18 +91,22 @@ export function PersonalReview({ mediaId, mediaType, rating, onRatingChange }: P
             {/* Review Content */}
             <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">Your Review:</span>
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setIsEditing(!isEditing)}
-                        className="text-xs"
-                    >
-                        {isEditing ? 'Cancel' : 'Edit'}
-                    </Button>
+                    <span className="text-sm font-medium">
+                        {isReadOnly ? 'Review:' : 'Your Review:'}
+                    </span>
+                    {!isReadOnly && (
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setIsEditing(!isEditing)}
+                            className="text-xs"
+                        >
+                            {isEditing ? 'Cancel' : 'Edit'}
+                        </Button>
+                    )}
                 </div>
 
-                {isEditing ? (
+                {isEditing && !isReadOnly ? (
                     <div className="space-y-2">
                         <textarea
                             value={reviewContent}

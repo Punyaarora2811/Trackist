@@ -41,9 +41,11 @@ interface ProgressTrackerProps {
         }
     }
     onEdit?: () => void
+    userId?: string // Optional userId for reviews
+    isReadOnly?: boolean // If true, shows in read-only mode
 }
 
-export function ProgressTracker({ userMedia, onEdit }: ProgressTrackerProps) {
+export function ProgressTracker({ userMedia, onEdit, userId, isReadOnly }: ProgressTrackerProps) {
     const [progress, setProgress] = useState(userMedia.progress)
     const [watchedEpisodes, setWatchedEpisodes] = useState(userMedia.watched_episodes || 0)
     const [totalEpisodes, setTotalEpisodes] = useState(userMedia.total_episodes || 0)
@@ -189,7 +191,7 @@ export function ProgressTracker({ userMedia, onEdit }: ProgressTrackerProps) {
                     </div>
 
                     <div className="flex items-center space-x-2">
-                        {userMedia.media.type === 'tv' && (
+                        {userMedia.media.type === 'tv' && !isReadOnly && (
                             <div className="flex items-center space-x-1">
                                 <Button
                                     variant="ghost"
@@ -211,14 +213,16 @@ export function ProgressTracker({ userMedia, onEdit }: ProgressTrackerProps) {
                                 </Button>
                             </div>
                         )}
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={handleRemove}
-                            className="text-destructive hover:text-destructive"
-                        >
-                            <Trash2 className="h-4 w-4" />
-                        </Button>
+                        {!isReadOnly && (
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={handleRemove}
+                                className="text-destructive hover:text-destructive"
+                            >
+                                <Trash2 className="h-4 w-4" />
+                            </Button>
+                        )}
                     </div>
                 </div>
             </CardHeader>
@@ -239,7 +243,7 @@ export function ProgressTracker({ userMedia, onEdit }: ProgressTrackerProps) {
                                 style={{ width: `${totalEpisodes > 0 ? (watchedEpisodes / totalEpisodes) * 100 : 0}%` }}
                             />
                         </div>
-                        {!totalEpisodes && (
+                        {!totalEpisodes && !isReadOnly && (
                             <div className="flex items-center space-x-2">
                                 <Button
                                     variant="outline"
@@ -256,44 +260,46 @@ export function ProgressTracker({ userMedia, onEdit }: ProgressTrackerProps) {
                 )}
 
                 {/* Quick Status Buttons */}
-                <div className="flex flex-wrap gap-2">
-                    <Button
-                        variant={userMedia.status === 'plan_to_watch' ? 'default' : 'outline'}
-                        size="sm"
-                        onClick={() => handleStatusChange('plan_to_watch')}
-                        disabled={updateStatusMutation.isPending}
-                    >
-                        <Clock className="h-3 w-3 mr-1" />
-                        {formatStatusName('plan_to_watch', userMedia.media.type)}
-                    </Button>
-                    <Button
-                        variant={userMedia.status === 'watching' ? 'default' : 'outline'}
-                        size="sm"
-                        onClick={() => handleStatusChange('watching')}
-                        disabled={updateStatusMutation.isPending}
-                    >
-                        <Play className="h-3 w-3 mr-1" />
-                        {formatStatusName('watching', userMedia.media.type)}
-                    </Button>
-                    <Button
-                        variant={userMedia.status === 'completed' ? 'default' : 'outline'}
-                        size="sm"
-                        onClick={() => handleStatusChange('completed')}
-                        disabled={updateStatusMutation.isPending}
-                    >
-                        <Check className="h-3 w-3 mr-1" />
-                        Completed
-                    </Button>
-                    <Button
-                        variant={userMedia.status === 'dropped' ? 'default' : 'outline'}
-                        size="sm"
-                        onClick={() => handleStatusChange('dropped')}
-                        disabled={updateStatusMutation.isPending}
-                    >
-                        <X className="h-3 w-3 mr-1" />
-                        Dropped
-                    </Button>
-                </div>
+                {!isReadOnly && (
+                    <div className="flex flex-wrap gap-2">
+                        <Button
+                            variant={userMedia.status === 'plan_to_watch' ? 'default' : 'outline'}
+                            size="sm"
+                            onClick={() => handleStatusChange('plan_to_watch')}
+                            disabled={updateStatusMutation.isPending}
+                        >
+                            <Clock className="h-3 w-3 mr-1" />
+                            {formatStatusName('plan_to_watch', userMedia.media.type)}
+                        </Button>
+                        <Button
+                            variant={userMedia.status === 'watching' ? 'default' : 'outline'}
+                            size="sm"
+                            onClick={() => handleStatusChange('watching')}
+                            disabled={updateStatusMutation.isPending}
+                        >
+                            <Play className="h-3 w-3 mr-1" />
+                            {formatStatusName('watching', userMedia.media.type)}
+                        </Button>
+                        <Button
+                            variant={userMedia.status === 'completed' ? 'default' : 'outline'}
+                            size="sm"
+                            onClick={() => handleStatusChange('completed')}
+                            disabled={updateStatusMutation.isPending}
+                        >
+                            <Check className="h-3 w-3 mr-1" />
+                            Completed
+                        </Button>
+                        <Button
+                            variant={userMedia.status === 'dropped' ? 'default' : 'outline'}
+                            size="sm"
+                            onClick={() => handleStatusChange('dropped')}
+                            disabled={updateStatusMutation.isPending}
+                        >
+                            <X className="h-3 w-3 mr-1" />
+                            Dropped
+                        </Button>
+                    </div>
+                )}
 
                 {/* Rating */}
                 <div className="space-y-2">
@@ -302,8 +308,8 @@ export function ProgressTracker({ userMedia, onEdit }: ProgressTrackerProps) {
                         {[1, 2, 3, 4, 5].map((star) => (
                             <button
                                 key={star}
-                                onClick={() => handleRatingChange(star)}
-                                disabled={updateRatingMutation.isPending}
+                                onClick={isReadOnly ? undefined : () => handleRatingChange(star)}
+                                disabled={updateRatingMutation.isPending || isReadOnly}
                                 className={cn(
                                     "transition-colors",
                                     star <= (userMedia.rating || 0)
@@ -328,6 +334,8 @@ export function ProgressTracker({ userMedia, onEdit }: ProgressTrackerProps) {
                     mediaType={userMedia.media.type}
                     rating={userMedia.rating || 0}
                     onRatingChange={handleRatingChange}
+                    userId={userId}
+                    isReadOnly={isReadOnly}
                 />
 
                 {/* Metadata */}

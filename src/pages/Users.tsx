@@ -4,6 +4,7 @@ import { useAllUsers, useFollowUser, useUnfollowUser, useIsFollowing } from '@/h
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
+import { toast } from '@/components/ui/Toast'
 import {
   Users,
   Search,
@@ -61,6 +62,7 @@ export function UsersPage({ onUserClick }: UsersPageProps) {
       }
     } catch (error) {
       console.error('Failed to toggle follow:', error)
+      toast.error('Failed to Update Follow Status', 'Could not update follow status. Please try again.')
     }
   }
 

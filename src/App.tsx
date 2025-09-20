@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { AuthProvider, useAuth } from '@/contexts/AuthContext'
 import { ThemeProvider } from '@/contexts/ThemeContext'
+import { ToastContainer } from '@/components/ui/Toast'
 import { Sidebar } from '@/components/Layout/Sidebar'
 import { Header } from '@/components/Layout/Header'
 import { Dashboard } from '@/pages/Dashboard'
@@ -21,8 +22,17 @@ const queryClient = new QueryClient()
 function AppContent() {
   const { user, loading } = useAuth()
   const [currentPage, setCurrentPage] = useState('dashboard')
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [dataSeeded, setDataSeeded] = useState(false)
+
+  const handlePageChange = (page: string) => {
+    // Clear selectedUserId when navigating to profile from sidebar (own profile)
+    if (page === 'profile') {
+      setSelectedUserId(null)
+    }
+    setCurrentPage(page)
+  }
 
   // Seed sample data if database is connected but empty
   useEffect(() => {
@@ -91,11 +101,17 @@ function AppContent() {
       case 'mylists':
         return <MyLists />
       case 'users':
-        return <UsersPage onUserClick={(userId) => setCurrentPage('profile')} />
+        return <UsersPage onUserClick={(userId) => {
+          setSelectedUserId(userId)
+          setCurrentPage('profile')
+        }} />
       case 'trending':
         return <Trending />
       case 'profile':
-        return <Profile />
+        return <Profile userId={selectedUserId || undefined} onUserClick={(userId) => {
+          setSelectedUserId(userId)
+          setCurrentPage('profile')
+        }} />
       case 'settings':
         return <Settings />
       default:
@@ -105,7 +121,7 @@ function AppContent() {
 
   return (
     <div className="h-screen bg-background flex overflow-hidden">
-      <Sidebar currentPage={currentPage} onPageChange={setCurrentPage} />
+      <Sidebar currentPage={currentPage} onPageChange={handlePageChange} />
 
       <div className="flex flex-col flex-1 overflow-hidden">
         <Header onMobileMenuToggle={() => setMobileMenuOpen(!mobileMenuOpen)} />
@@ -124,6 +140,7 @@ export default function App() {
       <ThemeProvider>
         <AuthProvider>
           <AppContent />
+          <ToastContainer />
         </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>

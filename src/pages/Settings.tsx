@@ -5,23 +5,19 @@ import { useUpdateProfile, useChangePassword, useChangeEmail } from '@/hooks/use
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
+import { toast } from '@/components/ui/Toast'
 import {
     User,
     Mail,
     Lock,
     Palette,
-    Bell,
     Shield,
-    Trash2,
     Save,
     Eye,
     EyeOff,
     Moon,
     Sun,
-    Settings as SettingsIcon,
-    AlertTriangle,
-    CheckCircle,
-    Info
+    Settings as SettingsIcon
 } from 'lucide-react'
 
 export function Settings() {
@@ -55,14 +51,6 @@ export function Settings() {
     const [isChangingEmail, setIsChangingEmail] = useState(false)
     const [emailForm, setEmailForm] = useState({
         newEmail: user?.email || ''
-    })
-
-    // Notification settings state
-    const [notifications, setNotifications] = useState({
-        emailUpdates: true,
-        weeklyDigest: true,
-        newFollowers: true,
-        mediaRecommendations: false
     })
 
     // Privacy settings state
@@ -122,16 +110,16 @@ export function Settings() {
                 }
             })
             console.log('Privacy settings saved successfully:', result)
-            alert('Privacy settings saved successfully!')
+            toast.success('Privacy Settings Saved', 'Your privacy preferences have been updated successfully!')
         } catch (error) {
             console.error('Failed to update privacy settings:', error)
-            alert('Failed to save privacy settings. Please try again.')
+            toast.error('Failed to Save Privacy Settings', 'Please try again or contact support if the issue persists.')
         }
     }
 
     const handleChangePassword = async () => {
         if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-            alert('New passwords do not match')
+            toast.error('Password Mismatch', 'New passwords do not match. Please try again.')
             return
         }
 
@@ -146,10 +134,10 @@ export function Settings() {
                 newPassword: '',
                 confirmPassword: ''
             })
-            alert('Password changed successfully!')
+            toast.success('Password Changed', 'Your password has been updated successfully!')
         } catch (error) {
             console.error('Failed to change password:', error)
-            alert('Failed to change password. Please check your current password.')
+            toast.error('Failed to Change Password', 'Please check your current password and try again.')
         }
     }
 
@@ -159,20 +147,10 @@ export function Settings() {
                 newEmail: emailForm.newEmail
             })
             setIsChangingEmail(false)
-            alert('Email change request sent! Please check your new email for confirmation.')
+            toast.success('Email Change Request Sent', 'Please check your new email for confirmation.')
         } catch (error) {
             console.error('Failed to change email:', error)
-            alert('Failed to change email. Please try again.')
-        }
-    }
-
-    const handleDeleteAccount = () => {
-        const confirmed = window.confirm(
-            'Are you sure you want to delete your account? This action cannot be undone and will permanently remove all your data.'
-        )
-        if (confirmed) {
-            // Implement account deletion logic here
-            alert('Account deletion feature coming soon. Please contact support.')
+            toast.error('Failed to Change Email', 'Please try again or contact support if the issue persists.')
         }
     }
 
@@ -502,89 +480,6 @@ export function Settings() {
                                     <Save className="h-4 w-4 mr-2" />
                                     Save Privacy Settings
                                 </Button>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    {/* Notifications Settings */}
-                    <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-white/20 dark:border-slate-700/50">
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2 text-slate-800 dark:text-slate-200">
-                                <Bell className="h-5 w-5" />
-                                Notifications
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-6">
-                            <div className="space-y-4">
-                                {Object.entries(notifications).map(([key, value]) => (
-                                    <div key={key} className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-700/50 rounded-lg">
-                                        <div>
-                                            <p className="font-medium text-slate-800 dark:text-slate-200">
-                                                {key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
-                                            </p>
-                                            <p className="text-sm text-slate-600 dark:text-slate-400">
-                                                {key === 'emailUpdates' && 'Receive email notifications for important updates'}
-                                                {key === 'weeklyDigest' && 'Get weekly summary of your activity'}
-                                                {key === 'newFollowers' && 'Notify when someone follows you'}
-                                                {key === 'mediaRecommendations' && 'Get personalized media recommendations'}
-                                            </p>
-                                        </div>
-                                        <Button
-                                            onClick={() => setNotifications(prev => ({ ...prev, [key]: !value }))}
-                                            className={`${value
-                                                ? 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800'
-                                                : 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800'
-                                                } text-white border-0`}
-                                        >
-                                            {value ? 'On' : 'Off'}
-                                        </Button>
-                                    </div>
-                                ))}
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    {/* Danger Zone */}
-                    <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-red-200 dark:border-red-800">
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2 text-red-600 dark:text-red-400">
-                                <AlertTriangle className="h-5 w-5" />
-                                Danger Zone
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-6">
-                            <div className="space-y-4">
-                                <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400" />
-                                        <p className="font-medium text-red-800 dark:text-red-200">Sign Out</p>
-                                    </div>
-                                    <p className="text-sm text-red-600 dark:text-red-400 mb-3">
-                                        Sign out of your account on this device
-                                    </p>
-                                    <Button
-                                        onClick={signOut}
-                                        className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white border-0"
-                                    >
-                                        Sign Out
-                                    </Button>
-                                </div>
-                                <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <Trash2 className="h-4 w-4 text-red-600 dark:text-red-400" />
-                                        <p className="font-medium text-red-800 dark:text-red-200">Delete Account</p>
-                                    </div>
-                                    <p className="text-sm text-red-600 dark:text-red-400 mb-3">
-                                        Permanently delete your account and all associated data. This action cannot be undone.
-                                    </p>
-                                    <Button
-                                        onClick={handleDeleteAccount}
-                                        className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white border-0"
-                                    >
-                                        <Trash2 className="h-4 w-4 mr-2" />
-                                        Delete Account
-                                    </Button>
-                                </div>
                             </div>
                         </CardContent>
                     </Card>

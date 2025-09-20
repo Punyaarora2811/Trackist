@@ -30,9 +30,10 @@ import { formatMediaType, formatStatusName } from '@/lib/utils'
 
 interface ProfileProps {
     userId?: string // If provided, show that user's profile, otherwise show current user's
+    onUserClick?: (userId: string) => void // Callback for when a user is clicked
 }
 
-export function Profile({ userId }: ProfileProps) {
+export function Profile({ userId, onUserClick }: ProfileProps) {
     const { userProfile: currentUser, user } = useAuth()
     const profileUserId = userId || user?.id || ''
 
@@ -407,6 +408,8 @@ export function Profile({ userId }: ProfileProps) {
                                         <ProgressTracker
                                             key={item.id}
                                             userMedia={item}
+                                            userId={profileUserId}
+                                            isReadOnly={!isOwnProfile}
                                         />
                                     ))}
                                 </div>
@@ -492,7 +495,7 @@ export function Profile({ userId }: ProfileProps) {
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                 {followers && followers.length > 0 ? (
                                     followers.map((follow) => (
-                                        <Card key={follow.id} className="group hover:shadow-xl transition-all duration-300 border-0 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
+                                        <Card key={follow.id} className="group hover:shadow-xl hover:scale-105 transition-all duration-300 border-0 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm cursor-pointer" onClick={() => onUserClick?.(follow.follower?.id)}>
                                             <CardContent className="p-6">
                                                 <div className="flex items-center gap-4">
                                                     <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center">
@@ -533,7 +536,7 @@ export function Profile({ userId }: ProfileProps) {
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                 {following && following.length > 0 ? (
                                     following.map((follow) => (
-                                        <Card key={follow.id} className="group hover:shadow-xl transition-all duration-300 border-0 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
+                                        <Card key={follow.id} className="group hover:shadow-xl hover:scale-105 transition-all duration-300 border-0 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm cursor-pointer" onClick={() => onUserClick?.(follow.following?.id)}>
                                             <CardContent className="p-6">
                                                 <div className="flex items-center gap-4">
                                                     <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center">

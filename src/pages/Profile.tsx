@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
-import { useUserProfile, useUserPublicMedia, useUserPublicStats, useUserFollowers, useUserFollowing } from '@/hooks/useMedia'
+import { useUserProfile, useUserPublicMedia, useUserPublicStats, useUserFollowers, useUserFollowing, useFollowUser, useUnfollowUser, useIsFollowing } from '@/hooks/useMedia'
 import { ProgressTracker } from '@/components/ProgressTracker'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
@@ -20,8 +20,6 @@ import {
     X,
     Users,
     Heart,
-    MessageCircle,
-    Share2,
     Flame,
     UserPlus,
     UserMinus
@@ -43,11 +41,36 @@ export function Profile({ userId, onUserClick }: ProfileProps) {
     const { data: followers } = useUserFollowers(profileUserId)
     const { data: following } = useUserFollowing(profileUserId)
 
+    // Follow functionality
+    const followUserMutation = useFollowUser()
+    const unfollowUserMutation = useUnfollowUser()
+    const { data: isFollowing } = useIsFollowing(user?.id || '', profileUserId)
+
     const [selectedTab, setSelectedTab] = useState<'overview' | 'media' | 'stats' | 'followers' | 'following'>('overview')
     const [selectedStatus, setSelectedStatus] = useState('all')
 
     const isOwnProfile = !userId || userId === user?.id
     const isPrivateProfile = !isOwnProfile && profile?.is_private
+
+    const handleFollowToggle = async () => {
+        if (!user?.id || !profileUserId) return
+
+        try {
+            if (isFollowing) {
+                await unfollowUserMutation.mutateAsync({
+                    followerId: user.id,
+                    followingId: profileUserId
+                })
+            } else {
+                await followUserMutation.mutateAsync({
+                    followerId: user.id,
+                    followingId: profileUserId
+                })
+            }
+        } catch (error) {
+            console.error('Failed to toggle follow:', error)
+        }
+    }
 
     const filteredMedia = userMedia?.filter(item => {
         if (selectedStatus === 'all') return true
@@ -170,19 +193,22 @@ export function Profile({ userId, onUserClick }: ProfileProps) {
                                     {/* Action Buttons */}
                                     <div className="flex gap-3">
                                         {!isOwnProfile && (
-                                            <>
-                                                <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0">
-                                                    <Heart className="h-4 w-4 mr-2" />
-                                                    Follow
-                                                </Button>
-                                                <Button variant="outline" className="border-slate-200 dark:border-slate-600 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20">
-                                                    <MessageCircle className="h-4 w-4 mr-2" />
-                                                    Message
-                                                </Button>
-                                                <Button variant="outline" className="border-slate-200 dark:border-slate-600 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20">
-                                                    <Share2 className="h-4 w-4" />
-                                                </Button>
-                                            </>
+                                            <Button 
+                                                onClick={handleFollowToggle}
+                                                disabled={followUserMutation.isPending || unfollowUserMutation.isPending}
+                                                className={`${isFollowing 
+                                                    ? 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800' 
+                                                    : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700'
+                                                } text-white border-0`}
+                                            >
+                                                <Heart className={`h-4 w-4 mr-2 ${isFollowing ? 'fill-current' : ''}`} />
+                                                {followUserMutation.isPending || unfollowUserMutation.isPending 
+                                                    ? 'Loading...' 
+                                                    : isFollowing 
+                                                        ? 'Unfollow' 
+                                                        : 'Follow'
+                                                }
+                                            </Button>
                                         )}
                                     </div>
                                 </div>

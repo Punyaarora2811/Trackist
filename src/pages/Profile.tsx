@@ -46,6 +46,7 @@ export function Profile({ userId }: ProfileProps) {
     const [selectedStatus, setSelectedStatus] = useState('all')
 
     const isOwnProfile = !userId || userId === user?.id
+    const isPrivateProfile = !isOwnProfile && profile?.is_private
 
     const filteredMedia = userMedia?.filter(item => {
         if (selectedStatus === 'all') return true
@@ -77,6 +78,39 @@ export function Profile({ userId }: ProfileProps) {
                             {[...Array(4)].map((_, i) => (
                                 <div key={i} className="h-24 bg-slate-200 dark:bg-slate-700 rounded"></div>
                             ))}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
+    // Show privacy message for private profiles
+    if (isPrivateProfile) {
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+                <div className="p-6 space-y-8">
+                    <div className="relative">
+                        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-pink-600/10 rounded-3xl blur-3xl"></div>
+                        <div className="relative bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-3xl p-8 border border-white/20 dark:border-slate-700/50">
+                            <div className="flex flex-col items-center justify-center text-center space-y-6">
+                                <div className="w-24 h-24 bg-gradient-to-br from-slate-400 to-slate-600 rounded-2xl flex items-center justify-center">
+                                    <User className="h-12 w-12 text-white" />
+                                </div>
+                                <div>
+                                    <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-200 mb-2">
+                                        {profile?.username || 'User'}
+                                    </h1>
+                                    <p className="text-slate-600 dark:text-slate-400">
+                                        This profile is private
+                                    </p>
+                                </div>
+                                <div className="bg-slate-100 dark:bg-slate-700 rounded-lg p-4 max-w-md">
+                                    <p className="text-sm text-slate-600 dark:text-slate-400">
+                                        This user has set their profile to private. Only they can see their media, statistics, and activity.
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -75,6 +75,20 @@ export function useUserPublicMedia(userId: string) {
   return useQuery({
     queryKey: ['userPublicMedia', userId],
     queryFn: async () => {
+      // First check if the user's profile is private
+      const { data: user, error: userError } = await supabase
+        .from('users')
+        .select('is_private')
+        .eq('id', userId)
+        .single()
+
+      if (userError) throw userError
+      
+      // If profile is private, return empty array
+      if (user?.is_private) {
+        return []
+      }
+
       const { data, error } = await supabase
         .from('user_media')
         .select(`
@@ -96,6 +110,33 @@ export function useUserPublicStats(userId: string) {
   return useQuery({
     queryKey: ['userPublicStats', userId],
     queryFn: async () => {
+      // First check if the user's profile is private
+      const { data: user, error: userError } = await supabase
+        .from('users')
+        .select('is_private')
+        .eq('id', userId)
+        .single()
+
+      if (userError) throw userError
+      
+      // If profile is private, return empty stats
+      if (user?.is_private) {
+        return {
+          total: 0,
+          completed: 0,
+          watching: 0,
+          planned: 0,
+          dropped: 0,
+          averageRating: 0,
+          movies: 0,
+          tv: 0,
+          books: 0,
+          games: 0,
+          streak: 0,
+          lastCompleted: null
+        }
+      }
+
       const { data, error } = await supabase
         .from('user_media')
         .select('status, rating, media(type), updated_at')
@@ -117,10 +158,10 @@ export function useUserPublicStats(userId: string) {
         : 0
 
       // Count by media type
-      const movies = data.filter(item => item.media?.type === 'movie').length
-      const tv = data.filter(item => item.media?.type === 'tv').length
-      const books = data.filter(item => item.media?.type === 'book').length
-      const games = data.filter(item => item.media?.type === 'game').length
+      const movies = data.filter(item => (item.media as any)?.type === 'movie').length
+      const tv = data.filter(item => (item.media as any)?.type === 'tv').length
+      const books = data.filter(item => (item.media as any)?.type === 'book').length
+      const games = data.filter(item => (item.media as any)?.type === 'game').length
 
       // Calculate streak
       const streak = calculateStreak(data)
@@ -390,7 +431,7 @@ export function useUpdateEpisodes() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['userMedia'] })
     },
-    onError: (error) => {
+    onError: () => {
       // Episode update failed - error will be handled by UI
     }
   })
@@ -463,7 +504,7 @@ export function useUpdateProfile() {
   return useMutation({
     mutationFn: async ({ userId, updates }: {
       userId: string
-      updates: { username?: string; bio?: string }
+      updates: { username?: string; bio?: string; is_private?: boolean; show_activity?: boolean }
     }) => {
       const { data, error } = await supabase
         .from('users')
@@ -475,7 +516,7 @@ export function useUpdateProfile() {
       if (error) throw error
       return data
     },
-    onSuccess: (data, variables) => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['userProfile', variables.userId] })
     },
   })
@@ -483,7 +524,7 @@ export function useUpdateProfile() {
 
 export function useChangePassword() {
   return useMutation({
-    mutationFn: async ({ currentPassword, newPassword }: {
+    mutationFn: async ({ newPassword }: {
       currentPassword: string
       newPassword: string
     }) => {
@@ -613,7 +654,8 @@ export function useAllUsers() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('users')
-        .select('id, username, bio, avatar_url, created_at')
+        .select('id, username, bio, avatar_url, created_at, is_private')
+        .eq('is_private', false) // Only show public profiles
         .order('created_at', { ascending: false })
 
       if (error) throw error
@@ -630,6 +672,7 @@ export function useFollowUser() {
       followerId: string
       followingId: string
     }) => {
+      console.log('Following user:', { followerId, followingId })
       const { data, error } = await supabase
         .from('follows')
         .insert({
@@ -639,12 +682,19 @@ export function useFollowUser() {
         .select()
         .single()
 
-      if (error) throw error
+      if (error) {
+        console.error('Error following user:', error)
+        throw error
+      }
+      console.log('Successfully followed user:', data)
       return data
     },
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['follows'] })
       queryClient.invalidateQueries({ queryKey: ['userStats'] })
+      queryClient.invalidateQueries({ queryKey: ['followers', variables.followingId] })
+      queryClient.invalidateQueries({ queryKey: ['following', variables.followerId] })
+      queryClient.invalidateQueries({ queryKey: ['isFollowing', variables.followerId, variables.followingId] })
     },
   })
 }
@@ -657,17 +707,25 @@ export function useUnfollowUser() {
       followerId: string
       followingId: string
     }) => {
+      console.log('Unfollowing user:', { followerId, followingId })
       const { error } = await supabase
         .from('follows')
         .delete()
         .eq('follower_id', followerId)
         .eq('following_id', followingId)
 
-      if (error) throw error
+      if (error) {
+        console.error('Error unfollowing user:', error)
+        throw error
+      }
+      console.log('Successfully unfollowed user')
     },
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['follows'] })
       queryClient.invalidateQueries({ queryKey: ['userStats'] })
+      queryClient.invalidateQueries({ queryKey: ['followers', variables.followingId] })
+      queryClient.invalidateQueries({ queryKey: ['following', variables.followerId] })
+      queryClient.invalidateQueries({ queryKey: ['isFollowing', variables.followerId, variables.followingId] })
     },
   })
 }
@@ -676,18 +734,44 @@ export function useUserFollowers(userId: string) {
   return useQuery({
     queryKey: ['followers', userId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      console.log('Fetching followers for userId:', userId)
+
+      // First get the follow records
+      const { data: follows, error: followsError } = await supabase
         .from('follows')
-        .select(`
-          *,
-          follower:users!follows_follower_id_fkey (
-            id, username, avatar_url, bio
-          )
-        `)
+        .select('*')
         .eq('following_id', userId)
 
-      if (error) throw error
-      return data
+      if (followsError) {
+        console.error('Error fetching follows:', followsError)
+        throw followsError
+      }
+
+      if (!follows || follows.length === 0) {
+        console.log('No followers found')
+        return []
+      }
+
+      // Then get the user details for each follower
+      const followerIds = follows.map(follow => follow.follower_id)
+      const { data: users, error: usersError } = await supabase
+        .from('users')
+        .select('id, username, avatar_url, bio')
+        .in('id', followerIds)
+
+      if (usersError) {
+        console.error('Error fetching users:', usersError)
+        throw usersError
+      }
+
+      // Combine the data
+      const result = follows.map(follow => ({
+        ...follow,
+        follower: users?.find(user => user.id === follow.follower_id)
+      }))
+
+      console.log('Followers data:', result)
+      return result
     },
     enabled: !!userId,
   })
@@ -697,18 +781,44 @@ export function useUserFollowing(userId: string) {
   return useQuery({
     queryKey: ['following', userId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      console.log('Fetching following for userId:', userId)
+
+      // First get the follow records
+      const { data: follows, error: followsError } = await supabase
         .from('follows')
-        .select(`
-          *,
-          following:users!follows_following_id_fkey (
-            id, username, avatar_url, bio
-          )
-        `)
+        .select('*')
         .eq('follower_id', userId)
 
-      if (error) throw error
-      return data
+      if (followsError) {
+        console.error('Error fetching follows:', followsError)
+        throw followsError
+      }
+
+      if (!follows || follows.length === 0) {
+        console.log('No following found')
+        return []
+      }
+
+      // Then get the user details for each person being followed
+      const followingIds = follows.map(follow => follow.following_id)
+      const { data: users, error: usersError } = await supabase
+        .from('users')
+        .select('id, username, avatar_url, bio')
+        .in('id', followingIds)
+
+      if (usersError) {
+        console.error('Error fetching users:', usersError)
+        throw usersError
+      }
+
+      // Combine the data
+      const result = follows.map(follow => ({
+        ...follow,
+        following: users?.find(user => user.id === follow.following_id)
+      }))
+
+      console.log('Following data:', result)
+      return result
     },
     enabled: !!userId,
   })

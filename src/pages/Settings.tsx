@@ -101,11 +101,31 @@ export function Settings() {
         try {
             await updateProfileMutation.mutateAsync({
                 userId: user.id,
-                updates: profileForm
+                updates: {
+                    ...profileForm,
+                    is_private: privacy.isPrivate,
+                    show_activity: privacy.showActivity
+                }
             })
             setIsEditingProfile(false)
         } catch (error) {
             console.error('Failed to update profile:', error)
+        }
+    }
+
+    const handleSavePrivacy = async () => {
+        if (!user?.id) return
+
+        try {
+            await updateProfileMutation.mutateAsync({
+                userId: user.id,
+                updates: {
+                    is_private: privacy.isPrivate,
+                    show_activity: privacy.showActivity
+                }
+            })
+        } catch (error) {
+            console.error('Failed to update privacy settings:', error)
         }
     }
 
@@ -488,6 +508,15 @@ export function Settings() {
                                         {privacy.showActivity ? 'Visible' : 'Hidden'}
                                     </Button>
                                 </div>
+                            </div>
+                            <div className="flex justify-end pt-4">
+                                <Button
+                                    onClick={handleSavePrivacy}
+                                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0"
+                                >
+                                    <Save className="h-4 w-4 mr-2" />
+                                    Save Privacy Settings
+                                </Button>
                             </div>
                         </CardContent>
                     </Card>

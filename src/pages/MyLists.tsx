@@ -138,7 +138,7 @@ export function MyLists() {
                   <Input
                     value={newPlaylist.name}
                     onChange={(e) => setNewPlaylist(prev => ({ ...prev, name: e.target.value }))}
-                    placeholder="Enter list name"
+                    placeholder="Enter List Name"
                     className="h-10"
                   />
                 </div>
@@ -149,7 +149,7 @@ export function MyLists() {
                   <Input
                     value={newPlaylist.description}
                     onChange={(e) => setNewPlaylist(prev => ({ ...prev, description: e.target.value }))}
-                    placeholder="Describe your list (optional)"
+                    placeholder="Describe Your List (Optional)"
                     className="h-10"
                   />
                 </div>
@@ -345,7 +345,7 @@ export function MyLists() {
                   <Input
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    placeholder="Search your tracked media..."
+                    placeholder="Search Your Tracked Media..."
                     className="pl-10 h-10"
                   />
                 </div>

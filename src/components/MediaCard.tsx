@@ -154,7 +154,7 @@ export function MediaCard({ media, showAddButton = true }: MediaCardProps) {
                 className="flex-1 text-xs"
               >
                 <Plus className="h-3 w-3 mr-1" />
-                Add to List
+                Add To List
               </Button>
             </div>
           ) : null}

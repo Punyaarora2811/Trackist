@@ -127,7 +127,7 @@ export function PersonalReview({ mediaId, mediaType, rating, onRatingChange }: P
                             <p className="text-sm">{reviewContent}</p>
                         ) : (
                             <p className="text-sm text-muted-foreground italic">
-                                Click "Edit" to add your review
+                                Click "Edit" To Add Your Review
                             </p>
                         )}
                     </div>

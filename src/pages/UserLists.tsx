@@ -211,7 +211,7 @@ export function UserLists() {
                             <div className="relative flex-1">
                                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
                                 <Input
-                                    placeholder="Search your media..."
+                                    placeholder="Search Your Media..."
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     className="pl-10 h-10 border-slate-200 dark:border-slate-600 focus:border-blue-500 focus:ring-blue-500/20"

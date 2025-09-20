@@ -166,16 +166,10 @@ export function Auth() {
                 className="text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors duration-200"
               >
                 {isLogin
-                  ? "Don't have an account? Sign up"
-                  : "Already have an account? Sign in"
+                  ? "Don't have an account? Sign Up"
+                  : "Already have an account? Sign In"
                 }
               </button>
-            </div>
-
-            <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl border border-blue-200/50 dark:border-blue-800/50">
-              <p className="text-xs text-blue-700 dark:text-blue-300 leading-relaxed">
-                <strong className="font-semibold">Demo:</strong> To connect to Supabase, click "Connect to Supabase" in the top right corner to set up your database.
-              </p>
             </div>
           </CardContent>
         </Card>

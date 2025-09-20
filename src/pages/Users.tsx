@@ -4,11 +4,11 @@ import { useAllUsers, useFollowUser, useUnfollowUser, useIsFollowing } from '@/h
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
-import { 
-  Users, 
-  Search, 
-  UserPlus, 
-  UserMinus, 
+import {
+  Users,
+  Search,
+  UserPlus,
+  UserMinus,
   Calendar,
   User as UserIcon,
   Filter
@@ -27,7 +27,7 @@ export function UsersPage({ onUserClick }: UsersPageProps) {
   const [searchTerm, setSearchTerm] = useState('')
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'name'>('newest')
 
-  const filteredUsers = allUsers?.filter(userItem => 
+  const filteredUsers = allUsers?.filter(userItem =>
     userItem.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
     userItem.bio?.toLowerCase().includes(searchTerm.toLowerCase())
   ) || []
@@ -117,7 +117,7 @@ export function UsersPage({ onUserClick }: UsersPageProps) {
                   <Input
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    placeholder="Search users by name or bio..."
+                    placeholder="Search Users By Name Or Bio..."
                     className="pl-10 h-12"
                   />
                 </div>
@@ -126,11 +126,10 @@ export function UsersPage({ onUserClick }: UsersPageProps) {
                 <Button
                   variant={sortBy === 'newest' ? 'default' : 'outline'}
                   onClick={() => setSortBy('newest')}
-                  className={`h-12 px-4 ${
-                    sortBy === 'newest'
-                      ? 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0'
-                      : 'border-slate-200 dark:border-slate-600 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20'
-                  }`}
+                  className={`h-12 px-4 ${sortBy === 'newest'
+                    ? 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0'
+                    : 'border-slate-200 dark:border-slate-600 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20'
+                    }`}
                 >
                   <Calendar className="h-4 w-4 mr-2" />
                   Newest
@@ -138,11 +137,10 @@ export function UsersPage({ onUserClick }: UsersPageProps) {
                 <Button
                   variant={sortBy === 'oldest' ? 'default' : 'outline'}
                   onClick={() => setSortBy('oldest')}
-                  className={`h-12 px-4 ${
-                    sortBy === 'oldest'
-                      ? 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0'
-                      : 'border-slate-200 dark:border-slate-600 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20'
-                  }`}
+                  className={`h-12 px-4 ${sortBy === 'oldest'
+                    ? 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0'
+                    : 'border-slate-200 dark:border-slate-600 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20'
+                    }`}
                 >
                   <Calendar className="h-4 w-4 mr-2" />
                   Oldest
@@ -150,11 +148,10 @@ export function UsersPage({ onUserClick }: UsersPageProps) {
                 <Button
                   variant={sortBy === 'name' ? 'default' : 'outline'}
                   onClick={() => setSortBy('name')}
-                  className={`h-12 px-4 ${
-                    sortBy === 'name'
-                      ? 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0'
-                      : 'border-slate-200 dark:border-slate-600 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20'
-                  }`}
+                  className={`h-12 px-4 ${sortBy === 'name'
+                    ? 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0'
+                    : 'border-slate-200 dark:border-slate-600 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20'
+                    }`}
                 >
                   <Filter className="h-4 w-4 mr-2" />
                   Name
@@ -220,13 +217,13 @@ function UserCard({ user, currentUserId, onUserClick, onFollowToggle }: UserCard
             </div>
             <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white dark:border-slate-800"></div>
           </div>
-          
+
           <div className="flex-1 min-w-0">
             <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200 truncate">
               {user.username}
             </h3>
             <p className="text-sm text-slate-600 dark:text-slate-400 mt-1 line-clamp-2">
-              {user.bio || 'No bio available'}
+              {user.bio || 'No Bio Available'}
             </p>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
               Joined {new Date(user.created_at).toLocaleDateString()}
@@ -245,9 +242,8 @@ function UserCard({ user, currentUserId, onUserClick, onFollowToggle }: UserCard
             <Button
               onClick={() => onFollowToggle(user.id, isFollowing || false)}
               variant="outline"
-              className={`border-slate-200 dark:border-slate-600 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 ${
-                isFollowing ? 'text-red-600 hover:text-red-700' : 'text-blue-600 hover:text-blue-700'
-              }`}
+              className={`border-slate-200 dark:border-slate-600 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 ${isFollowing ? 'text-red-600 hover:text-red-700' : 'text-blue-600 hover:text-blue-700'
+                }`}
             >
               {isFollowing ? (
                 <>

@@ -1,12 +1,12 @@
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/contexts/AuthContext'
-import { 
-  Home, 
-  Search, 
-  Bookmark, 
-  TrendingUp, 
-  User, 
-  Settings, 
+import {
+  Home,
+  Search,
+  Bookmark,
+  TrendingUp,
+  User,
+  Settings,
   BarChart3,
   Users,
   List

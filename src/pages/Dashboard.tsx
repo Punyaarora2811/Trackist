@@ -195,7 +195,7 @@ export function Dashboard() {
             <Card key={type} className="group hover:shadow-xl transition-all duration-300 border-0 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-semibold text-slate-700 dark:text-slate-200">
-                  {type === 'tv' ? 'TV Shows' : type.charAt(0).toUpperCase() + type.slice(1) + 's'}
+                  {type === 'tv' ? 'TV Shows' : type.charAt(0).toUpperCase() + type.slice(1).toLowerCase() + 's'}
                 </CardTitle>
                 <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                   <span className="text-xl">
@@ -279,20 +279,20 @@ export function Dashboard() {
             <CardContent>
               <div className="text-4xl font-bold text-orange-600 dark:text-orange-400 mb-2">{currentStreak}</div>
               <p className="text-slate-600 dark:text-slate-300 mb-4">
-                {currentStreak === 0 ? 'No active streak' :
-                  currentStreak === 1 ? 'day streak' : 'days streak'}
+                {currentStreak === 0 ? 'No Active Streak' :
+                  currentStreak === 1 ? 'Day Streak' : 'Days Streak'}
               </p>
               <div className="text-sm text-slate-600 dark:text-slate-400">
                 {currentStreak > 0 && (
                   <div className="bg-white/50 dark:bg-slate-800/50 rounded-lg p-3">
-                    <span className="font-medium">Last completed:</span><br />
+                    <span className="font-medium">Last Completed:</span><br />
                     {userMedia?.filter(item => item.status === 'completed')
                       .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())[0]?.media.title}
                   </div>
                 )}
                 {currentStreak === 0 && userMedia?.filter(item => item.status === 'completed').length > 0 && (
                   <div className="bg-white/50 dark:bg-slate-800/50 rounded-lg p-3 text-center">
-                    Complete something to start your streak! 🔥
+                    Complete Something To Start Your Streak! 🔥
                   </div>
                 )}
               </div>

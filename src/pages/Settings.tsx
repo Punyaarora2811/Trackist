@@ -209,7 +209,7 @@ export function Settings() {
                                         <Input
                                             value={profileForm.bio}
                                             onChange={(e) => setProfileForm(prev => ({ ...prev, bio: e.target.value }))}
-                                            placeholder="Tell us about yourself"
+                                            placeholder="Tell Us About Yourself"
                                             className="h-10"
                                         />
                                     </div>
@@ -236,7 +236,7 @@ export function Settings() {
                                     <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-700/50 rounded-lg">
                                         <div>
                                             <p className="font-medium text-slate-800 dark:text-slate-200">Username</p>
-                                            <p className="text-sm text-slate-600 dark:text-slate-400">{userProfile?.username || 'Not set'}</p>
+                                            <p className="text-sm text-slate-600 dark:text-slate-400">{userProfile?.username || 'Not Set'}</p>
                                         </div>
                                     </div>
                                     <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-700/50 rounded-lg">
@@ -278,7 +278,7 @@ export function Settings() {
                                                 type={showPasswords.current ? 'text' : 'password'}
                                                 value={passwordForm.currentPassword}
                                                 onChange={(e) => setPasswordForm(prev => ({ ...prev, currentPassword: e.target.value }))}
-                                                placeholder="Enter current password"
+                                                placeholder="Enter Current Password"
                                                 className="h-10 pr-10"
                                             />
                                             <button
@@ -299,7 +299,7 @@ export function Settings() {
                                                 type={showPasswords.new ? 'text' : 'password'}
                                                 value={passwordForm.newPassword}
                                                 onChange={(e) => setPasswordForm(prev => ({ ...prev, newPassword: e.target.value }))}
-                                                placeholder="Enter new password"
+                                                placeholder="Enter New Password"
                                                 className="h-10 pr-10"
                                             />
                                             <button
@@ -320,7 +320,7 @@ export function Settings() {
                                                 type={showPasswords.confirm ? 'text' : 'password'}
                                                 value={passwordForm.confirmPassword}
                                                 onChange={(e) => setPasswordForm(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                                                placeholder="Confirm new password"
+                                                placeholder="Confirm New Password"
                                                 className="h-10 pr-10"
                                             />
                                             <button
@@ -379,7 +379,7 @@ export function Settings() {
                                             type="email"
                                             value={emailForm.newEmail}
                                             onChange={(e) => setEmailForm(prev => ({ ...prev, newEmail: e.target.value }))}
-                                            placeholder="Enter new email address"
+                                            placeholder="Enter New Email Address"
                                             className="h-10"
                                         />
                                     </div>
@@ -406,7 +406,7 @@ export function Settings() {
                                     <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-700/50 rounded-lg">
                                         <div>
                                             <p className="font-medium text-slate-800 dark:text-slate-200">Email Address</p>
-                                            <p className="text-sm text-slate-600 dark:text-slate-400">{user?.email || 'Not set'}</p>
+                                            <p className="text-sm text-slate-600 dark:text-slate-400">{user?.email || 'Not Set'}</p>
                                         </div>
                                     </div>
                                     <Button
@@ -466,8 +466,8 @@ export function Settings() {
                                     <Button
                                         onClick={() => setPrivacy(prev => ({ ...prev, isPrivate: !prev.isPrivate }))}
                                         className={`${privacy.isPrivate
-                                                ? 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800'
-                                                : 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800'
+                                            ? 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800'
+                                            : 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800'
                                             } text-white border-0`}
                                     >
                                         {privacy.isPrivate ? 'Private' : 'Public'}
@@ -481,8 +481,8 @@ export function Settings() {
                                     <Button
                                         onClick={() => setPrivacy(prev => ({ ...prev, showActivity: !prev.showActivity }))}
                                         className={`${privacy.showActivity
-                                                ? 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800'
-                                                : 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800'
+                                            ? 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800'
+                                            : 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800'
                                             } text-white border-0`}
                                     >
                                         {privacy.showActivity ? 'Visible' : 'Hidden'}
@@ -518,8 +518,8 @@ export function Settings() {
                                         <Button
                                             onClick={() => setNotifications(prev => ({ ...prev, [key]: !value }))}
                                             className={`${value
-                                                    ? 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800'
-                                                    : 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800'
+                                                ? 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800'
+                                                : 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800'
                                                 } text-white border-0`}
                                         >
                                             {value ? 'On' : 'Off'}

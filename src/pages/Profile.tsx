@@ -1,31 +1,28 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
-import { useUserProfile, useUserPublicMedia, useUserPublicStats, useUpdateProfile } from '@/hooks/useMedia'
+import { useUserProfile, useUserPublicMedia, useUserPublicStats } from '@/hooks/useMedia'
 import { ProgressTracker } from '@/components/ProgressTracker'
 import { Button } from '@/components/ui/Button'
-import { Input } from '@/components/ui/Input'
 import { Badge } from '@/components/ui/Badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
-import {
-    User,
-    Calendar,
-    Star,
-    Film,
-    Tv,
-    Book,
-    Gamepad2,
-    BarChart3,
-    Check,
-    Play,
-    Clock,
-    X,
-    Users,
-    Heart,
-    MessageCircle,
-    Share2,
-    Edit3,
-    Save,
-    Flame
+import { 
+  User, 
+  Calendar, 
+  Star, 
+  Film, 
+  Tv, 
+  Book, 
+  Gamepad2,
+  BarChart3,
+  Check,
+  Play,
+  Clock,
+  X,
+  Users,
+  Heart,
+  MessageCircle,
+  Share2,
+  Flame
 } from 'lucide-react'
 import { formatMediaType, formatStatusName } from '@/lib/utils'
 
@@ -34,47 +31,17 @@ interface ProfileProps {
 }
 
 export function Profile({ userId }: ProfileProps) {
-    const { userProfile: currentUser, user } = useAuth()
-    const profileUserId = userId || user?.id || ''
+  const { userProfile: currentUser, user } = useAuth()
+  const profileUserId = userId || user?.id || ''
+  
+  const { data: profile, isLoading: isLoadingProfile } = useUserProfile(profileUserId)
+  const { data: userMedia, isLoading: isLoadingMedia } = useUserPublicMedia(profileUserId)
+  const { data: userStats, isLoading: isLoadingStats } = useUserPublicStats(profileUserId)
+  
+  const [selectedTab, setSelectedTab] = useState<'overview' | 'media' | 'stats'>('overview')
+  const [selectedStatus, setSelectedStatus] = useState('all')
 
-    const { data: profile, isLoading: isLoadingProfile } = useUserProfile(profileUserId)
-    const { data: userMedia, isLoading: isLoadingMedia } = useUserPublicMedia(profileUserId)
-    const { data: userStats, isLoading: isLoadingStats } = useUserPublicStats(profileUserId)
-    const updateProfileMutation = useUpdateProfile()
-
-    const [selectedTab, setSelectedTab] = useState<'overview' | 'media' | 'stats'>('overview')
-    const [selectedStatus, setSelectedStatus] = useState('all')
-    const [isEditing, setIsEditing] = useState(false)
-    const [editForm, setEditForm] = useState({
-        username: profile?.username || '',
-        bio: profile?.bio || ''
-    })
-
-    const isOwnProfile = !userId || userId === user?.id
-
-    // Update edit form when profile data changes
-    useEffect(() => {
-        if (profile) {
-            setEditForm({
-                username: profile.username || '',
-                bio: profile.bio || ''
-            })
-        }
-    }, [profile])
-
-    const handleSaveProfile = async () => {
-        if (!user?.id) return
-
-        try {
-            await updateProfileMutation.mutateAsync({
-                userId: user.id,
-                updates: editForm
-            })
-            setIsEditing(false)
-        } catch (error) {
-            console.error('Failed to update profile:', error)
-        }
-    }
+  const isOwnProfile = !userId || userId === user?.id
 
     const filteredMedia = userMedia?.filter(item => {
         if (selectedStatus === 'all') return true
@@ -130,107 +97,49 @@ export function Profile({ userId }: ProfileProps) {
                             {/* Profile Info */}
                             <div className="flex-1">
                                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                                    <div>
-                                        {isEditing ? (
-                                            <div className="space-y-4">
-                                                <div>
-                                                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">
-                                                        Username
-                                                    </label>
-                                                    <Input
-                                                        value={editForm.username}
-                                                        onChange={(e) => setEditForm(prev => ({ ...prev, username: e.target.value }))}
-                                                        placeholder="Enter your username"
-                                                        className="h-10"
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">
-                                                        Bio
-                                                    </label>
-                                                    <Input
-                                                        value={editForm.bio}
-                                                        onChange={(e) => setEditForm(prev => ({ ...prev, bio: e.target.value }))}
-                                                        placeholder="Tell us about yourself"
-                                                        className="h-10"
-                                                    />
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            <>
-                                                <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent leading-tight">
-                                                    {profile?.username || 'Anonymous User'}
-                                                </h1>
-                                                <p className="text-slate-600 dark:text-slate-300 mt-2 text-lg">
-                                                    {profile?.bio || 'No bio available'}
-                                                </p>
-                                            </>
-                                        )}
-                                        <div className="flex items-center gap-4 mt-3 text-sm text-slate-500 dark:text-slate-400">
-                                            <div className="flex items-center gap-1">
-                                                <Calendar className="h-4 w-4" />
-                                                <span>Joined {profile?.created_at ? new Date(profile.created_at).toLocaleDateString() : 'Unknown'}</span>
-                                            </div>
-                                            <div className="flex items-center gap-1">
-                                                <Users className="h-4 w-4" />
-                                                <span>{userStats?.total || 0} items tracked</span>
-                                            </div>
-                                            {userStats?.streak && userStats.streak > 0 && (
-                                                <div className="flex items-center gap-1">
-                                                    <Flame className="h-4 w-4 text-orange-500" />
-                                                    <span>{userStats.streak} day streak</span>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
+                  <div>
+                    <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent leading-tight">
+                      {profile?.username || 'Anonymous User'}
+                    </h1>
+                    <p className="text-slate-600 dark:text-slate-300 mt-2 text-lg">
+                      {profile?.bio || 'No bio available'}
+                    </p>
+                    <div className="flex items-center gap-4 mt-3 text-sm text-slate-500 dark:text-slate-400">
+                      <div className="flex items-center gap-1">
+                        <Calendar className="h-4 w-4" />
+                        <span>Joined {profile?.created_at ? new Date(profile.created_at).toLocaleDateString() : 'Unknown'}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Users className="h-4 w-4" />
+                        <span>{userStats?.total || 0} items tracked</span>
+                      </div>
+                      {userStats?.streak && userStats.streak > 0 && (
+                        <div className="flex items-center gap-1">
+                          <Flame className="h-4 w-4 text-orange-500" />
+                          <span>{userStats.streak} day streak</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
 
-                                    {/* Action Buttons */}
-                                    <div className="flex gap-3">
-                                        {isOwnProfile ? (
-                                            isEditing ? (
-                                                <>
-                                                    <Button
-                                                        onClick={handleSaveProfile}
-                                                        disabled={updateProfileMutation.isPending}
-                                                        className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0"
-                                                    >
-                                                        <Save className="h-4 w-4 mr-2" />
-                                                        {updateProfileMutation.isPending ? 'Saving...' : 'Save'}
-                                                    </Button>
-                                                    <Button
-                                                        variant="outline"
-                                                        onClick={() => setIsEditing(false)}
-                                                        className="border-slate-200 dark:border-slate-600 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20"
-                                                    >
-                                                        Cancel
-                                                    </Button>
-                                                </>
-                                            ) : (
-                                                <Button
-                                                    variant="outline"
-                                                    onClick={() => setIsEditing(true)}
-                                                    className="border-slate-200 dark:border-slate-600 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20"
-                                                >
-                                                    <Edit3 className="h-4 w-4 mr-2" />
-                                                    Edit Profile
-                                                </Button>
-                                            )
-                                        ) : (
-                                            <>
-                                                <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0">
-                                                    <Heart className="h-4 w-4 mr-2" />
-                                                    Follow
-                                                </Button>
-                                                <Button variant="outline" className="border-slate-200 dark:border-slate-600 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20">
-                                                    <MessageCircle className="h-4 w-4 mr-2" />
-                                                    Message
-                                                </Button>
-                                                <Button variant="outline" className="border-slate-200 dark:border-slate-600 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20">
-                                                    <Share2 className="h-4 w-4" />
-                                                </Button>
-                                            </>
-                                        )}
-                                    </div>
+                  {/* Action Buttons */}
+                  <div className="flex gap-3">
+                    {!isOwnProfile && (
+                      <>
+                        <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0">
+                          <Heart className="h-4 w-4 mr-2" />
+                          Follow
+                        </Button>
+                        <Button variant="outline" className="border-slate-200 dark:border-slate-600 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20">
+                          <MessageCircle className="h-4 w-4 mr-2" />
+                          Message
+                        </Button>
+                        <Button variant="outline" className="border-slate-200 dark:border-slate-600 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20">
+                          <Share2 className="h-4 w-4" />
+                        </Button>
+                      </>
+                    )}
+                  </div>
                                 </div>
                             </div>
                         </div>

@@ -1,6 +1,5 @@
 import { useAuth } from '@/contexts/AuthContext'
 import { Button } from '@/components/ui/Button'
-import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { LogOut, Menu } from 'lucide-react'
 
 interface HeaderProps {
@@ -42,8 +41,6 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
                 </div>
               </div>
             </div>
-
-            <ThemeToggle />
 
             <Button
               variant="ghost"

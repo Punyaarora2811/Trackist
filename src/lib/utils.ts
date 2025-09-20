@@ -47,3 +47,44 @@ export function getStatusColor(status: string) {
       return 'bg-gray-100 text-gray-800'
   }
 }
+
+export function capitalizeFirst(str: string): string {
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
+}
+
+export function formatStatusName(status: string, mediaType?: string): string {
+  const baseStatus = status.replace(/_/g, ' ').split(' ').map(word => capitalizeFirst(word)).join(' ')
+
+  // Customize status text based on media type
+  if (status === 'plan_to_watch') {
+    switch (mediaType) {
+      case 'book': return 'Plan to Read'
+      case 'game': return 'Plan to Play'
+      case 'movie':
+      case 'tv':
+      default: return 'Plan to Watch'
+    }
+  }
+
+  if (status === 'watching') {
+    switch (mediaType) {
+      case 'book': return 'Reading'
+      case 'game': return 'Playing'
+      case 'movie':
+      case 'tv':
+      default: return 'Watching'
+    }
+  }
+
+  return baseStatus
+}
+
+export function formatMediaType(type: string): string {
+  const typeMap: Record<string, string> = {
+    'movie': 'Movie',
+    'tv': 'TV Show',
+    'book': 'Book',
+    'game': 'Game'
+  }
+  return typeMap[type] || capitalizeFirst(type)
+}

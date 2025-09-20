@@ -85,6 +85,8 @@ export type Database = {
           media_id: string
           status: 'plan_to_watch' | 'watching' | 'completed' | 'dropped'
           progress: number
+          watched_episodes?: number
+          total_episodes?: number
           rating?: number
           created_at: string
           updated_at: string
@@ -95,6 +97,8 @@ export type Database = {
           media_id: string
           status: 'plan_to_watch' | 'watching' | 'completed' | 'dropped'
           progress?: number
+          watched_episodes?: number
+          total_episodes?: number
           rating?: number
           created_at?: string
           updated_at?: string
@@ -102,6 +106,8 @@ export type Database = {
         Update: {
           status?: 'plan_to_watch' | 'watching' | 'completed' | 'dropped'
           progress?: number
+          watched_episodes?: number
+          total_episodes?: number
           rating?: number
           updated_at?: string
         }

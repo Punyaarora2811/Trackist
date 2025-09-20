@@ -6,6 +6,7 @@ import { Sidebar } from '@/components/Layout/Sidebar'
 import { Header } from '@/components/Layout/Header'
 import { Dashboard } from '@/pages/Dashboard'
 import { Search } from '@/pages/Search'
+import { UserLists } from '@/pages/UserLists'
 import { Auth } from '@/pages/Auth'
 import { supabase } from '@/lib/supabase'
 import { sampleMedia, sampleUserMedia } from '@/data/sampleData'
@@ -81,12 +82,7 @@ function AppContent() {
       case 'search':
         return <Search />
       case 'lists':
-        return (
-          <div className="p-6">
-            <h1 className="text-3xl font-bold text-foreground mb-4">My Lists</h1>
-            <p className="text-muted-foreground">Manage your watchlists, reading lists, and gaming queues here.</p>
-          </div>
-        )
+        return <UserLists />
       case 'trending':
         return (
           <div className="p-6">

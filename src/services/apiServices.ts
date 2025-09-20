@@ -140,6 +140,31 @@ export async function searchGames(query: string): Promise<MediaItem[]> {
   }
 }
 
+// TMDB TV Show Details - Get total episodes
+export async function getTVShowDetails(apiId: string): Promise<{ totalEpisodes: number; totalSeasons: number } | null> {
+  if (!TMDB_API_KEY) {
+    return null
+  }
+
+  try {
+    const response = await fetch(
+      `${TMDB_BASE_URL}/tv/${apiId}?api_key=${TMDB_API_KEY}`
+    )
+
+    if (!response.ok) throw new Error('TMDB API error')
+
+    const data = await response.json()
+
+    return {
+      totalEpisodes: data.number_of_episodes || 0,
+      totalSeasons: data.number_of_seasons || 0
+    }
+  } catch (error) {
+    // Error fetching TV show details - return null
+    return null
+  }
+}
+
 // Combined search function
 export async function searchAllMedia(query: string, type?: string): Promise<MediaItem[]> {
   const promises: Promise<MediaItem[]>[] = []

@@ -25,8 +25,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (session?.user) {
         // Don't await - fetch in background and don't block loading
-        fetchUserProfile(session.user.id).catch(err => {
-          console.warn('Failed to fetch user profile:', err)
+        fetchUserProfile(session.user.id).catch(() => {
+          // Failed to fetch user profile - will retry on next auth change
         })
       }
 
@@ -40,8 +40,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         if (session?.user) {
           // Don't await - fetch in background and don't block loading
-          fetchUserProfile(session.user.id).catch(err => {
-            console.warn('Failed to fetch user profile:', err)
+          fetchUserProfile(session.user.id).catch(() => {
+            // Failed to fetch user profile - will retry on next auth change
           })
         } else {
           setUserProfile(null)
@@ -70,13 +70,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const { data, error } = await Promise.race([queryPromise, timeoutPromise]) as any
 
       if (error) {
-        console.warn('Error fetching user profile:', error.message)
         setUserProfile(null)
       } else {
         setUserProfile(data)
       }
     } catch (error) {
-      console.error('Failed to fetch user profile:', error)
       setUserProfile(null)
     }
   }

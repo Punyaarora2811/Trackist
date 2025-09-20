@@ -26,7 +26,7 @@ export function Sidebar({ currentPage, onPageChange }: SidebarProps) {
   const navigation = [
     { name: 'Dashboard', icon: Home, id: 'dashboard' },
     { name: 'Search', icon: Search, id: 'search' },
-    { name: 'My Lists', icon: Bookmark, id: 'lists' },
+    { name: 'My Media', icon: Bookmark, id: 'lists' },
     { name: 'Trending', icon: TrendingUp, id: 'trending' },
   ]
 

@@ -10,6 +10,8 @@ import { UserLists } from '@/pages/UserLists'
 import { Trending } from '@/pages/Trending'
 import { Profile } from '@/pages/Profile'
 import { Settings } from '@/pages/Settings'
+import { MyLists } from '@/pages/MyLists'
+import { UsersPage } from '@/pages/Users'
 import { Auth } from '@/pages/Auth'
 import { supabase } from '@/lib/supabase'
 import { sampleMedia, sampleUserMedia } from '@/data/sampleData'
@@ -86,6 +88,10 @@ function AppContent() {
         return <Search />
       case 'lists':
         return <UserLists />
+      case 'mylists':
+        return <MyLists />
+      case 'users':
+        return <UsersPage onUserClick={(userId) => setCurrentPage('profile')} />
       case 'trending':
         return <Trending />
       case 'profile':

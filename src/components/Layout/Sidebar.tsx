@@ -1,14 +1,15 @@
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/contexts/AuthContext'
-import {
-  Home,
-  Search,
-  Bookmark,
-  TrendingUp,
-  User,
-  Settings,
+import { 
+  Home, 
+  Search, 
+  Bookmark, 
+  TrendingUp, 
+  User, 
+  Settings, 
   BarChart3,
-  Users
+  Users,
+  List
 } from 'lucide-react'
 
 interface SidebarProps {
@@ -23,6 +24,8 @@ export function Sidebar({ currentPage, onPageChange }: SidebarProps) {
     { name: 'Dashboard', icon: Home, id: 'dashboard' },
     { name: 'Search', icon: Search, id: 'search' },
     { name: 'My Media', icon: Bookmark, id: 'lists' },
+    { name: 'My Lists', icon: List, id: 'mylists' },
+    { name: 'Users', icon: Users, id: 'users' },
     { name: 'Trending', icon: TrendingUp, id: 'trending' },
   ]
 

@@ -508,6 +508,230 @@ export function useChangeEmail() {
   })
 }
 
+export function useCreatePlaylist() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({ userId, name, description, isPublic }: {
+      userId: string
+      name: string
+      description?: string
+      isPublic?: boolean
+    }) => {
+      const { data, error } = await supabase
+        .from('playlists')
+        .insert({
+          user_id: userId,
+          name,
+          description,
+          is_public: isPublic ?? true
+        })
+        .select()
+        .single()
+
+      if (error) throw error
+      return data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['playlists'] })
+    },
+  })
+}
+
+export function useUserPlaylists(userId: string) {
+  return useQuery({
+    queryKey: ['playlists', userId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('playlists')
+        .select(`
+          *,
+          playlist_items (
+            *,
+            media (*)
+          )
+        `)
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+
+      if (error) throw error
+      return data
+    },
+    enabled: !!userId,
+  })
+}
+
+export function useAddToPlaylist() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({ playlistId, mediaId }: {
+      playlistId: string
+      mediaId: string
+    }) => {
+      const { data, error } = await supabase
+        .from('playlist_items')
+        .insert({
+          playlist_id: playlistId,
+          media_id: mediaId
+        })
+        .select()
+        .single()
+
+      if (error) throw error
+      return data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['playlists'] })
+    },
+  })
+}
+
+export function useRemoveFromPlaylist() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({ playlistItemId }: {
+      playlistItemId: string
+    }) => {
+      const { error } = await supabase
+        .from('playlist_items')
+        .delete()
+        .eq('id', playlistItemId)
+
+      if (error) throw error
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['playlists'] })
+    },
+  })
+}
+
+export function useAllUsers() {
+  return useQuery({
+    queryKey: ['allUsers'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('users')
+        .select('id, username, bio, avatar_url, created_at')
+        .order('created_at', { ascending: false })
+
+      if (error) throw error
+      return data
+    },
+  })
+}
+
+export function useFollowUser() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({ followerId, followingId }: {
+      followerId: string
+      followingId: string
+    }) => {
+      const { data, error } = await supabase
+        .from('follows')
+        .insert({
+          follower_id: followerId,
+          following_id: followingId
+        })
+        .select()
+        .single()
+
+      if (error) throw error
+      return data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['follows'] })
+      queryClient.invalidateQueries({ queryKey: ['userStats'] })
+    },
+  })
+}
+
+export function useUnfollowUser() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({ followerId, followingId }: {
+      followerId: string
+      followingId: string
+    }) => {
+      const { error } = await supabase
+        .from('follows')
+        .delete()
+        .eq('follower_id', followerId)
+        .eq('following_id', followingId)
+
+      if (error) throw error
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['follows'] })
+      queryClient.invalidateQueries({ queryKey: ['userStats'] })
+    },
+  })
+}
+
+export function useUserFollowers(userId: string) {
+  return useQuery({
+    queryKey: ['followers', userId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('follows')
+        .select(`
+          *,
+          follower:users!follows_follower_id_fkey (
+            id, username, avatar_url, bio
+          )
+        `)
+        .eq('following_id', userId)
+
+      if (error) throw error
+      return data
+    },
+    enabled: !!userId,
+  })
+}
+
+export function useUserFollowing(userId: string) {
+  return useQuery({
+    queryKey: ['following', userId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('follows')
+        .select(`
+          *,
+          following:users!follows_following_id_fkey (
+            id, username, avatar_url, bio
+          )
+        `)
+        .eq('follower_id', userId)
+
+      if (error) throw error
+      return data
+    },
+    enabled: !!userId,
+  })
+}
+
+export function useIsFollowing(followerId: string, followingId: string) {
+  return useQuery({
+    queryKey: ['isFollowing', followerId, followingId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('follows')
+        .select('id')
+        .eq('follower_id', followerId)
+        .eq('following_id', followingId)
+        .single()
+
+      if (error && error.code !== 'PGRST116') throw error
+      return !!data
+    },
+    enabled: !!followerId && !!followingId,
+  })
+}
+
 export function useRemoveFromList() {
   const queryClient = useQueryClient()
 

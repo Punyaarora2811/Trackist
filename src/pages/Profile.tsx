@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
-import { useUserProfile, useUserPublicMedia, useUserPublicStats } from '@/hooks/useMedia'
+import { useUserProfile, useUserPublicMedia, useUserPublicStats, useUserFollowers, useUserFollowing } from '@/hooks/useMedia'
 import { ProgressTracker } from '@/components/ProgressTracker'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
@@ -22,7 +22,9 @@ import {
   Heart,
   MessageCircle,
   Share2,
-  Flame
+  Flame,
+  UserPlus,
+  UserMinus
 } from 'lucide-react'
 import { formatMediaType, formatStatusName } from '@/lib/utils'
 
@@ -37,8 +39,10 @@ export function Profile({ userId }: ProfileProps) {
   const { data: profile, isLoading: isLoadingProfile } = useUserProfile(profileUserId)
   const { data: userMedia, isLoading: isLoadingMedia } = useUserPublicMedia(profileUserId)
   const { data: userStats, isLoading: isLoadingStats } = useUserPublicStats(profileUserId)
+  const { data: followers } = useUserFollowers(profileUserId)
+  const { data: following } = useUserFollowing(profileUserId)
   
-  const [selectedTab, setSelectedTab] = useState<'overview' | 'media' | 'stats'>('overview')
+  const [selectedTab, setSelectedTab] = useState<'overview' | 'media' | 'stats' | 'followers' | 'following'>('overview')
   const [selectedStatus, setSelectedStatus] = useState('all')
 
   const isOwnProfile = !userId || userId === user?.id
@@ -59,6 +63,8 @@ export function Profile({ userId }: ProfileProps) {
         { id: 'overview', label: 'Overview', icon: User },
         { id: 'media', label: 'Media', icon: Film },
         { id: 'stats', label: 'Statistics', icon: BarChart3 },
+        { id: 'followers', label: 'Followers', icon: UserPlus },
+        { id: 'following', label: 'Following', icon: UserMinus },
     ]
 
     if (isLoadingProfile || isLoadingStats) {
@@ -104,21 +110,25 @@ export function Profile({ userId }: ProfileProps) {
                     <p className="text-slate-600 dark:text-slate-300 mt-2 text-lg">
                       {profile?.bio || 'No bio available'}
                     </p>
-                    <div className="flex items-center gap-4 mt-3 text-sm text-slate-500 dark:text-slate-400">
-                      <div className="flex items-center gap-1">
-                        <Calendar className="h-4 w-4" />
-                        <span>Joined {profile?.created_at ? new Date(profile.created_at).toLocaleDateString() : 'Unknown'}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Users className="h-4 w-4" />
-                        <span>{userStats?.total || 0} items tracked</span>
-                      </div>
-                      {userStats?.streak && userStats.streak > 0 && (
-                        <div className="flex items-center gap-1">
-                          <Flame className="h-4 w-4 text-orange-500" />
-                          <span>{userStats.streak} day streak</span>
+                    <div className="flex items-center gap-6 mt-4">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-slate-900 dark:text-white">
+                          {userStats?.total || 0}
                         </div>
-                      )}
+                        <div className="text-sm text-slate-500 dark:text-slate-400">Media</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-slate-900 dark:text-white">
+                          {followers?.length || 0}
+                        </div>
+                        <div className="text-sm text-slate-500 dark:text-slate-400">Followers</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-slate-900 dark:text-white">
+                          {following?.length || 0}
+                        </div>
+                        <div className="text-sm text-slate-500 dark:text-slate-400">Following</div>
+                      </div>
                     </div>
                   </div>
 
@@ -439,6 +449,88 @@ export function Profile({ userId }: ProfileProps) {
                                         </div>
                                     </CardContent>
                                 </Card>
+                            </div>
+                        </div>
+                    )}
+
+                    {selectedTab === 'followers' && (
+                        <div className="space-y-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {followers && followers.length > 0 ? (
+                                    followers.map((follow) => (
+                                        <Card key={follow.id} className="group hover:shadow-xl transition-all duration-300 border-0 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
+                                            <CardContent className="p-6">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center">
+                                                        <User className="h-6 w-6 text-white" />
+                                                    </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200 truncate">
+                                                            {follow.follower?.username}
+                                                        </h3>
+                                                        <p className="text-sm text-slate-600 dark:text-slate-400 truncate">
+                                                            {follow.follower?.bio || 'No bio available'}
+                                                        </p>
+                                                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                                                            Followed {new Date(follow.created_at).toLocaleDateString()}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </CardContent>
+                                        </Card>
+                                    ))
+                                ) : (
+                                    <div className="col-span-full text-center py-12">
+                                        <div className="w-24 h-24 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                            <UserPlus className="h-12 w-12 text-slate-400" />
+                                        </div>
+                                        <h3 className="text-xl font-semibold text-slate-800 dark:text-slate-200 mb-2">No followers yet</h3>
+                                        <p className="text-slate-600 dark:text-slate-400">
+                                            Share your profile to get followers
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
+                    {selectedTab === 'following' && (
+                        <div className="space-y-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {following && following.length > 0 ? (
+                                    following.map((follow) => (
+                                        <Card key={follow.id} className="group hover:shadow-xl transition-all duration-300 border-0 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
+                                            <CardContent className="p-6">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center">
+                                                        <User className="h-6 w-6 text-white" />
+                                                    </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200 truncate">
+                                                            {follow.following?.username}
+                                                        </h3>
+                                                        <p className="text-sm text-slate-600 dark:text-slate-400 truncate">
+                                                            {follow.following?.bio || 'No bio available'}
+                                                        </p>
+                                                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                                                            Following since {new Date(follow.created_at).toLocaleDateString()}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </CardContent>
+                                        </Card>
+                                    ))
+                                ) : (
+                                    <div className="col-span-full text-center py-12">
+                                        <div className="w-24 h-24 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                            <UserMinus className="h-12 w-12 text-slate-400" />
+                                        </div>
+                                        <h3 className="text-xl font-semibold text-slate-800 dark:text-slate-200 mb-2">Not following anyone</h3>
+                                        <p className="text-slate-600 dark:text-slate-400">
+                                            Discover users to follow and see their activity
+                                        </p>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     )}

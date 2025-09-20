@@ -157,6 +157,50 @@ export type Database = {
           created_at?: string
         }
       }
+      playlists: {
+        Row: {
+          id: string
+          user_id: string
+          name: string
+          description?: string
+          is_public: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          name: string
+          description?: string
+          is_public?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          name?: string
+          description?: string
+          is_public?: boolean
+          updated_at?: string
+        }
+      }
+      playlist_items: {
+        Row: {
+          id: string
+          playlist_id: string
+          media_id: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          playlist_id: string
+          media_id: string
+          created_at?: string
+        }
+        Update: {
+          playlist_id?: string
+          media_id?: string
+        }
+      }
     }
   }
 }

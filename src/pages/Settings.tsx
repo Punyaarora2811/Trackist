@@ -100,8 +100,6 @@ export function Settings() {
     const handleSavePrivacy = async () => {
         if (!user?.id) return
 
-        console.log('Saving privacy settings:', { isPrivate: privacy.isPrivate })
-
         try {
             const result = await updateProfileMutation.mutateAsync({
                 userId: user.id,
@@ -109,7 +107,6 @@ export function Settings() {
                     is_private: privacy.isPrivate
                 }
             })
-            console.log('Privacy settings saved successfully:', result)
             toast.success('Privacy Settings Saved', 'Your privacy preferences have been updated successfully!')
         } catch (error) {
             console.error('Failed to update privacy settings:', error)

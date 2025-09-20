@@ -506,8 +506,6 @@ export function useUpdateProfile() {
       userId: string
       updates: { username?: string; bio?: string; is_private?: boolean }
     }) => {
-      console.log('Updating profile for user:', userId, 'with updates:', updates)
-
       const { data, error } = await supabase
         .from('users')
         .update(updates)
@@ -520,11 +518,9 @@ export function useUpdateProfile() {
         throw error
       }
 
-      console.log('Profile updated successfully:', data)
       return data
     },
     onSuccess: (_, variables) => {
-      console.log('Invalidating queries for user:', variables.userId)
       queryClient.invalidateQueries({ queryKey: ['userProfile', variables.userId] })
     },
   })
@@ -680,7 +676,6 @@ export function useFollowUser() {
       followerId: string
       followingId: string
     }) => {
-      console.log('Following user:', { followerId, followingId })
       const { data, error } = await supabase
         .from('follows')
         .insert({
@@ -694,7 +689,6 @@ export function useFollowUser() {
         console.error('Error following user:', error)
         throw error
       }
-      console.log('Successfully followed user:', data)
       return data
     },
     onSuccess: (_, variables) => {
@@ -715,7 +709,6 @@ export function useUnfollowUser() {
       followerId: string
       followingId: string
     }) => {
-      console.log('Unfollowing user:', { followerId, followingId })
       const { error } = await supabase
         .from('follows')
         .delete()
@@ -726,7 +719,6 @@ export function useUnfollowUser() {
         console.error('Error unfollowing user:', error)
         throw error
       }
-      console.log('Successfully unfollowed user')
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['follows'] })
@@ -742,7 +734,6 @@ export function useUserFollowers(userId: string) {
   return useQuery({
     queryKey: ['followers', userId],
     queryFn: async () => {
-      console.log('Fetching followers for userId:', userId)
 
       // First get the follow records
       const { data: follows, error: followsError } = await supabase
@@ -756,7 +747,6 @@ export function useUserFollowers(userId: string) {
       }
 
       if (!follows || follows.length === 0) {
-        console.log('No followers found')
         return []
       }
 
@@ -778,7 +768,6 @@ export function useUserFollowers(userId: string) {
         follower: users?.find(user => user.id === follow.follower_id)
       }))
 
-      console.log('Followers data:', result)
       return result
     },
     enabled: !!userId,
@@ -789,7 +778,6 @@ export function useUserFollowing(userId: string) {
   return useQuery({
     queryKey: ['following', userId],
     queryFn: async () => {
-      console.log('Fetching following for userId:', userId)
 
       // First get the follow records
       const { data: follows, error: followsError } = await supabase
@@ -803,7 +791,6 @@ export function useUserFollowing(userId: string) {
       }
 
       if (!follows || follows.length === 0) {
-        console.log('No following found')
         return []
       }
 
@@ -825,7 +812,6 @@ export function useUserFollowing(userId: string) {
         following: users?.find(user => user.id === follow.following_id)
       }))
 
-      console.log('Following data:', result)
       return result
     },
     enabled: !!userId,

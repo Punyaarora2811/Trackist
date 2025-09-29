@@ -4,6 +4,13 @@ A modern, full-stack media tracking application built with React, TypeScript, an
 
 ## ✨ Features
 
+### 🎯 Novel Feature: Smart Recommendations
+- **✨ RecommendMe**: AI-powered content recommendations based on available time
+- **Time-based suggestions**: Get perfect recommendations for 30 minutes, 2 hours, or even a week
+- **Genre analysis**: Learns from your media library to suggest content you'll love
+- **Comprehensive database**: Covers TV shows, movies, books, games, and story-driven experiences
+- **Smart categorization**: Automatically suggests the best content type for your time slot
+
 ### Core Functionality
 - **Multi-media tracking**: Movies, TV shows, books, and games
 - **Progress tracking**: Track watching progress, reading progress, and gaming hours
@@ -29,6 +36,13 @@ A modern, full-stack media tracking application built with React, TypeScript, an
 ### Prerequisites
 - Node.js 18+ and npm
 - Supabase account (optional for demo mode)
+
+### 🎯 Try the RecommendMe Feature
+1. Start the app and create an account
+2. Add some media to your library (movies, shows, books, games)
+3. Navigate to the **RecommendMe** tab in the sidebar
+4. Enter how much time you have (e.g., "2 hours", "30 minutes", "1 day")
+5. Get personalized recommendations based on your preferences!
 
 ### Installation
 
@@ -73,6 +87,9 @@ src/
 ├── pages/               # Application pages
 │   ├── Dashboard.tsx    # Main dashboard
 │   ├── Search.tsx       # Media search
+│   ├── RecommendMe.tsx  # Smart recommendations
+│   ├── Trending.tsx     # Trending content
+│   ├── UserLists.tsx    # User media lists
 │   └── Auth.tsx         # Login/Register
 └── data/                # Sample data for demo mode
     └── sampleData.ts    # Mock media and user data
@@ -176,6 +193,12 @@ The application is fully responsive with:
 - [Lucide React](https://lucide.dev) for the icon system
 - [Recharts](https://recharts.org) for the data visualization
 - [Pexels](https://pexels.com) for the sample images
+
+## 🌟 What Makes Trackist Special
+
+**Trackist** stands out with its innovative **RecommendMe** feature - the first media tracking app to offer time-based, AI-powered content recommendations. Whether you have 30 minutes for a quick episode or a whole weekend for an epic gaming session, Trackist intelligently suggests the perfect content based on your preferences and available time.
+
+The app combines the best of traditional media tracking with cutting-edge recommendation algorithms, making it easier than ever to discover your next favorite movie, show, book, or game.
 
 ---
 

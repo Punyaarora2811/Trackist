@@ -16,6 +16,7 @@ import { formatMediaType } from '@/lib/utils'
 
 export function Trending() {
     const [selectedType, setSelectedType] = useState('all')
+    const [showFilters, setShowFilters] = useState(false)
     const { userProfile } = useAuth()
     const addToListMutation = useAddToList()
 
@@ -94,25 +95,43 @@ export function Trending() {
 
                 {/* Media Type Filter */}
                 <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl p-6 border border-white/20 dark:border-slate-700/50">
-                    <div className="flex flex-wrap gap-3">
-                        {mediaTypes.map((type) => (
-                            <Button
-                                key={type.id}
-                                variant={selectedType === type.id ? 'default' : 'outline'}
-                                onClick={() => setSelectedType(type.id)}
-                                className={`h-12 px-6 ${selectedType === type.id
-                                    ? 'bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white border-0'
-                                    : 'border-slate-200 dark:border-slate-600 hover:border-orange-500 hover:bg-orange-50 dark:hover:bg-orange-900/20'
-                                    }`}
-                            >
-                                <type.icon className="h-4 w-4 mr-2" />
-                                {type.label}
-                                <span className="ml-2 px-2 py-1 bg-white/20 dark:bg-black/20 rounded-full text-xs">
-                                    {type.count}
-                                </span>
-                            </Button>
-                        ))}
+                    <div className="flex items-center justify-between">
+                        <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200">Filter by Media Type</h3>
+                        <Button
+                            variant={showFilters ? 'default' : 'outline'}
+                            size="sm"
+                            onClick={() => setShowFilters(!showFilters)}
+                            className={`h-10 px-4 ${showFilters
+                                ? 'bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white border-0'
+                                : 'border-slate-200 dark:border-slate-600 hover:border-orange-500 hover:bg-orange-50 dark:hover:bg-orange-900/20'
+                                }`}
+                        >
+                            <TrendingUp className="h-4 w-4 mr-2" />
+                            Filters
+                        </Button>
                     </div>
+
+                    {showFilters && (
+                        <div className="flex flex-wrap gap-3 mt-4">
+                            {mediaTypes.map((type) => (
+                                <Button
+                                    key={type.id}
+                                    variant={selectedType === type.id ? 'default' : 'outline'}
+                                    onClick={() => setSelectedType(type.id)}
+                                    className={`h-12 px-6 ${selectedType === type.id
+                                        ? 'bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white border-0'
+                                        : 'border-slate-200 dark:border-slate-600 hover:border-orange-500 hover:bg-orange-50 dark:hover:bg-orange-900/20'
+                                        }`}
+                                >
+                                    <type.icon className="h-4 w-4 mr-2" />
+                                    {type.label}
+                                    <span className="ml-2 px-2 py-1 bg-white/20 dark:bg-black/20 rounded-full text-xs">
+                                        {type.count}
+                                    </span>
+                                </Button>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 {/* Trending Content */}

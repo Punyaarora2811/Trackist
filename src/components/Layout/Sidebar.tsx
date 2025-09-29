@@ -9,7 +9,8 @@ import {
   Settings,
   BarChart3,
   Users,
-  List
+  List,
+  Sparkles
 } from 'lucide-react'
 
 interface SidebarProps {
@@ -27,6 +28,7 @@ export function Sidebar({ currentPage, onPageChange }: SidebarProps) {
     { name: 'My Lists', icon: List, id: 'mylists' },
     { name: 'Users', icon: Users, id: 'users' },
     { name: 'Trending', icon: TrendingUp, id: 'trending' },
+    { name: 'Recommend Me', icon: Sparkles, id: 'recommend' },
   ]
 
   const userNav = [

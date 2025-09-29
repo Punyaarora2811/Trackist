@@ -10,6 +10,7 @@ import { formatMediaType } from '@/lib/utils'
 export function Search() {
   const [query, setQuery] = useState('')
   const [selectedType, setSelectedType] = useState('all')
+  const [showFilters, setShowFilters] = useState(false)
   const { userProfile } = useAuth()
 
   const { data: searchResults, isLoading } = useMediaSearch(query, selectedType)
@@ -64,7 +65,22 @@ export function Search() {
               />
             </div>
 
-            <div className="flex items-center space-x-2">
+            <Button
+              variant={showFilters ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setShowFilters(!showFilters)}
+              className={`h-12 px-4 ${showFilters
+                ? 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0'
+                : 'border-slate-200 dark:border-slate-600 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20'
+                }`}
+            >
+              <Filter className="h-5 w-5 mr-2" />
+              Filters
+            </Button>
+          </div>
+
+          {showFilters && (
+            <div className="flex items-center space-x-2 mt-4">
               <Filter className="h-5 w-5 text-slate-400" />
               <div className="flex flex-wrap gap-2">
                 {mediaTypes.map((type) => (
@@ -83,7 +99,7 @@ export function Search() {
                 ))}
               </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Results */}

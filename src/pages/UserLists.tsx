@@ -28,6 +28,7 @@ export function UserLists() {
     const [selectedType, setSelectedType] = useState('all')
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('list')
     const [sortBy, setSortBy] = useState<'recent' | 'title' | 'rating' | 'progress'>('title')
+    const [showFilters, setShowFilters] = useState(false)
 
     const { data: allUserMedia, isLoading: isLoadingAll } = useUserMedia(userProfile?.id || '')
     const { data: statusFilteredMedia, isLoading: isLoadingStatus } = useUserMediaByStatus(
@@ -218,6 +219,20 @@ export function UserLists() {
                                 />
                             </div>
 
+                            {/* Filter Toggle Button */}
+                            <Button
+                                variant={showFilters ? 'default' : 'outline'}
+                                size="sm"
+                                onClick={() => setShowFilters(!showFilters)}
+                                className={`h-10 px-4 ${showFilters
+                                    ? 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0'
+                                    : 'border-slate-200 dark:border-slate-600 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20'
+                                    }`}
+                            >
+                                <Filter className="h-4 w-4 mr-2" />
+                                Filters
+                            </Button>
+
                             {/* View Mode Toggle */}
                             <div className="flex items-center space-x-2">
                                 <Button
@@ -237,60 +252,62 @@ export function UserLists() {
                             </div>
                         </div>
 
-                        <div className="flex flex-col md:flex-row gap-4 mt-4">
-                            {/* Status Filter */}
-                            <div className="flex items-center space-x-2">
-                                <Filter className="h-4 w-4 text-muted-foreground" />
-                                <div className="flex flex-wrap gap-1">
-                                    {statusOptions.map((option) => (
-                                        <Button
-                                            key={option.id}
-                                            variant={selectedStatus === option.id ? 'default' : 'outline'}
-                                            size="sm"
-                                            onClick={() => setSelectedStatus(option.id)}
-                                        >
-                                            {option.label}
-                                            {option.count > 0 && (
-                                                <Badge variant="secondary" className="ml-1 text-xs">
-                                                    {option.count}
-                                                </Badge>
-                                            )}
-                                        </Button>
-                                    ))}
+                        {showFilters && (
+                            <div className="flex flex-col md:flex-row gap-4 mt-4">
+                                {/* Status Filter */}
+                                <div className="flex items-center space-x-2">
+                                    <Filter className="h-4 w-4 text-muted-foreground" />
+                                    <div className="flex flex-wrap gap-1">
+                                        {statusOptions.map((option) => (
+                                            <Button
+                                                key={option.id}
+                                                variant={selectedStatus === option.id ? 'default' : 'outline'}
+                                                size="sm"
+                                                onClick={() => setSelectedStatus(option.id)}
+                                            >
+                                                {option.label}
+                                                {option.count > 0 && (
+                                                    <Badge variant="secondary" className="ml-1 text-xs">
+                                                        {option.count}
+                                                    </Badge>
+                                                )}
+                                            </Button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Type Filter */}
+                                <div className="flex items-center space-x-2">
+                                    <div className="flex flex-wrap gap-1">
+                                        {typeOptions.map((option) => (
+                                            <Button
+                                                key={option.id}
+                                                variant={selectedType === option.id ? 'default' : 'outline'}
+                                                size="sm"
+                                                onClick={() => setSelectedType(option.id)}
+                                            >
+                                                {option.label}
+                                            </Button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Sort */}
+                                <div className="flex items-center space-x-2">
+                                    <select
+                                        value={sortBy}
+                                        onChange={(e) => setSortBy(e.target.value as any)}
+                                        className="px-3 py-2 border border-input rounded-md bg-background text-sm"
+                                    >
+                                        {sortOptions.map((option) => (
+                                            <option key={option.id} value={option.id}>
+                                                {option.label}
+                                            </option>
+                                        ))}
+                                    </select>
                                 </div>
                             </div>
-
-                            {/* Type Filter */}
-                            <div className="flex items-center space-x-2">
-                                <div className="flex flex-wrap gap-1">
-                                    {typeOptions.map((option) => (
-                                        <Button
-                                            key={option.id}
-                                            variant={selectedType === option.id ? 'default' : 'outline'}
-                                            size="sm"
-                                            onClick={() => setSelectedType(option.id)}
-                                        >
-                                            {option.label}
-                                        </Button>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Sort */}
-                            <div className="flex items-center space-x-2">
-                                <select
-                                    value={sortBy}
-                                    onChange={(e) => setSortBy(e.target.value as any)}
-                                    className="px-3 py-2 border border-input rounded-md bg-background text-sm"
-                                >
-                                    {sortOptions.map((option) => (
-                                        <option key={option.id} value={option.id}>
-                                            {option.label}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
+                        )}
                     </CardHeader>
                 </Card>
 

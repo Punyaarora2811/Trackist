@@ -13,6 +13,7 @@ import { Profile } from '@/pages/Profile'
 import { Settings } from '@/pages/Settings'
 import { MyLists } from '@/pages/MyLists'
 import { UsersPage } from '@/pages/Users'
+import { RecommendMe } from '@/pages/RecommendMe'
 import { Auth } from '@/pages/Auth'
 import { supabase } from '@/lib/supabase'
 import { sampleMedia, sampleUserMedia } from '@/data/sampleData'
@@ -107,6 +108,8 @@ function AppContent() {
         }} />
       case 'trending':
         return <Trending />
+      case 'recommend':
+        return <RecommendMe />
       case 'profile':
         return <Profile userId={selectedUserId || undefined} onUserClick={(userId) => {
           setSelectedUserId(userId)

@@ -27,6 +27,7 @@ function AppContent() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [dataSeeded, setDataSeeded] = useState(false)
 
+
   const handlePageChange = (page: string) => {
     // Clear selectedUserId when navigating to profile from sidebar (own profile)
     if (page === 'profile') {
